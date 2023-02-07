@@ -28,8 +28,8 @@ import torchsummary
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 from PIL import Image
-sys.path.append('KneeLocalizer/oulukneeloc/')
-from detector import KneeLocalizer
+# sys.path.append('KneeLocalizer/oulukneeloc/')
+# from detector import KneeLocalizer
 
 
 
@@ -104,7 +104,7 @@ class XRayImageDataset:
         self.reprocess_all_images = reprocess_all_images
         self.downsample_factor_on_reload = downsample_factor_on_reload
         self.show_both_knees_in_each_image = show_both_knees_in_each_image
-        self.knee_localizer = KneeLocalizer()
+        # self.knee_localizer = KneeLocalizer()
         self.crop_to_just_the_knee = crop_to_just_the_knee
 
         if use_small_data:
@@ -127,7 +127,7 @@ class XRayImageDataset:
             # The external package that we uses loads them as 8-bit rather than 16-bit or something. 
             self.diacom_image_statistics = {}
             self.compute_dataset_image_statistics_and_divide_by_max(just_normalize_cropped_knees=False)
-            self.compute_dataset_image_statistics_and_divide_by_max(just_normalize_cropped_knees=True)
+            # self.compute_dataset_image_statistics_and_divide_by_max(just_normalize_cropped_knees=True)
 
             for i in range(len(self.images)):
                 # don't save extra images
@@ -139,25 +139,29 @@ class XRayImageDataset:
             print("loading images from %s" % self.processed_image_path)
             reloaded_data = pickle.load(open(self.processed_image_path, 'rb'))
             self.images = reloaded_data['images']
+            print("pickle images loaded")
             if not self.crop_to_just_the_knee:
                 if not self.show_both_knees_in_each_image:
+                    print("cut_images_in_two")
                     self.cut_images_in_two() # cut into left + right images. 
                 else:
+                    print("flip_right_images")
                     self.flip_right_images() # if you want both knees in one image, flip the right images so knees are on same side. 
-            else:
-                for i in range(len(self.images)):
-                    assert self.images[i]['cropped_left_knee'].max() <= 1
-                    assert self.images[i]['cropped_right_knee'].max() <= 1
-                    assert self.images[i]['cropped_left_knee'].min() >= 0
-                    assert self.images[i]['cropped_right_knee'].min() >= 0
+            # else:
+            #     for i in range(len(self.images)):
+            #         assert self.images[i]['cropped_left_knee'].max() <= 1
+            #         assert self.images[i]['cropped_right_knee'].max() <= 1
+            #         assert self.images[i]['cropped_left_knee'].min() >= 0
+            #         assert self.images[i]['cropped_right_knee'].min() >= 0
 
-                    self.images[i]['left_knee_scaled_to_zero_one'] = self.images[i]['cropped_left_knee'].copy()
-                    self.images[i]['right_knee_scaled_to_zero_one'] = self.images[i]['cropped_right_knee'][:, ::-1].copy()
-                    self.images[i]['cropped_left_knee'] = None
-                    self.images[i]['cropped_right_knee'] = None
+            #         self.images[i]['left_knee_scaled_to_zero_one'] = self.images[i]['cropped_left_knee'].copy()
+            #         self.images[i]['right_knee_scaled_to_zero_one'] = self.images[i]['cropped_right_knee'][:, ::-1].copy()
+            #         self.images[i]['cropped_left_knee'] = None
+            #         self.images[i]['cropped_right_knee'] = None
 
 
             if self.downsample_factor_on_reload is not None:
+                print("downsample_factor_on_reload")
                 for i in range(len(self.images)):
                     for side in ['left', 'right']:
                         orig_shape = self.images[i]['%s_knee_scaled_to_zero_one' % side].shape
@@ -176,31 +180,31 @@ class XRayImageDataset:
             #self.plot_pipeline_examples(25) # make sanity check plots
             print("Successfully loaded %i images" % len(self.images))
 
-    def crop_to_knee(self, dicom_image_path):
-        results = self.knee_localizer.predict(dicom_image_path)
-        if results is None:
-            print("Warning: was not able to identify bounding boxes for this knee.")
-            return None, None
-        bounding_boxes, image = results
-        l_bounding_box, r_bounding_box = bounding_boxes
-        # IMPORTANT AND CONFUSING: THE IMAGE ON THE LEFT IS THE RIGHT KNEE.
-        # Per email: "Confusingly, the knee on the right of the image is the patient's left knee."
-        assert l_bounding_box[0] > r_bounding_box[0]
-        assert l_bounding_box[2] > r_bounding_box[2]
-        left_knee = image[l_bounding_box[1]:l_bounding_box[3], l_bounding_box[0]:l_bounding_box[2]]
-        right_knee = image[r_bounding_box[1]:r_bounding_box[3], r_bounding_box[0]:r_bounding_box[2]] 
-        print("Size of left knee prior to resizing is", left_knee.shape)
-        print("Size of right knee prior to resizing is", right_knee.shape)
-        if min(left_knee.shape) == 0 or min(right_knee.shape) == 0:
-            print("Warning: was not able to identify bounding boxes for this knee.")
-            return None, None
+    # def crop_to_knee(self, dicom_image_path):
+    #     results = self.knee_localizer.predict(dicom_image_path)
+    #     if results is None:
+    #         print("Warning: was not able to identify bounding boxes for this knee.")
+    #         return None, None
+    #     bounding_boxes, image = results
+    #     l_bounding_box, r_bounding_box = bounding_boxes
+    #     # IMPORTANT AND CONFUSING: THE IMAGE ON THE LEFT IS THE RIGHT KNEE.
+    #     # Per email: "Confusingly, the knee on the right of the image is the patient's left knee."
+    #     assert l_bounding_box[0] > r_bounding_box[0]
+    #     assert l_bounding_box[2] > r_bounding_box[2]
+    #     left_knee = image[l_bounding_box[1]:l_bounding_box[3], l_bounding_box[0]:l_bounding_box[2]]
+    #     right_knee = image[r_bounding_box[1]:r_bounding_box[3], r_bounding_box[0]:r_bounding_box[2]] 
+    #     print("Size of left knee prior to resizing is", left_knee.shape)
+    #     print("Size of right knee prior to resizing is", right_knee.shape)
+    #     if min(left_knee.shape) == 0 or min(right_knee.shape) == 0:
+    #         print("Warning: was not able to identify bounding boxes for this knee.")
+    #         return None, None
 
-        left_knee = self.resize_image(left_knee, CROPPED_KNEE_RESAMPLED_IMAGE_SIZE)
-        right_knee = self.resize_image(right_knee, CROPPED_KNEE_RESAMPLED_IMAGE_SIZE)
+    #     left_knee = self.resize_image(left_knee, CROPPED_KNEE_RESAMPLED_IMAGE_SIZE)
+    #     right_knee = self.resize_image(right_knee, CROPPED_KNEE_RESAMPLED_IMAGE_SIZE)
 
-        print("Size of left knee after resizing is", left_knee.shape)
-        print("Size of right knee after resizing is", right_knee.shape)
-        return left_knee, right_knee
+    #     print("Size of left knee after resizing is", left_knee.shape)
+    #     print("Size of right knee after resizing is", right_knee.shape)
+    #     return left_knee, right_knee
         
     def load_all_images(self):
         """
@@ -267,9 +271,9 @@ class XRayImageDataset:
 
                                 
                                 if diacom_image is not None:
-                                    cropped_left_knee, cropped_right_knee = self.crop_to_knee(image_path)
-                                    if (cropped_left_knee is None) or (cropped_right_knee is None):
-                                        print("Warning: unable to crop knee image.")
+                                    # cropped_left_knee, cropped_right_knee = self.crop_to_knee(image_path)
+                                    # if (cropped_left_knee is None) or (cropped_right_knee is None):
+                                    #     print("Warning: unable to crop knee image.")
 
                                     image_array = self.get_resized_pixel_array_from_dicom_image(diacom_image)
                                     self.images.append({'timepoint_dir':timepoint_dir, 
@@ -282,8 +286,8 @@ class XRayImageDataset:
                                         'body_part':diacom_image.BodyPartExamined, 
                                         'series_description':diacom_image.SeriesDescription,
                                         'unnormalized_image_array':image_array, 
-                                        'cropped_left_knee':cropped_left_knee, 
-                                        'cropped_right_knee':cropped_right_knee,
+                                        # 'cropped_left_knee':cropped_left_knee, 
+                                        # 'cropped_right_knee':cropped_right_knee,
                                         # Users may also want to identify the specific image that was assessed to generate the data for an anatomic site and time point and merge the image assessment data with meta-data about that image (please see Appendix D for example SAS code). Individual images (radiographs, MRI series) are identified by a unique barcode. The barcode is recorded in the AccessionNumber in the DICOM header of the image.
                                         'barcode':diacom_image.AccessionNumber
                                         })
@@ -424,31 +428,31 @@ class XRayImageDataset:
 
         all_pixel_arrays = []
         for i in range(len(self.images)):
-            if just_normalize_cropped_knees:
-                if self.images[i]['cropped_right_knee'] is not None:
-                    all_pixel_arrays.append(self.images[i]['cropped_right_knee'])
-                    all_pixel_arrays.append(self.images[i]['cropped_left_knee'])
-            else:
-                all_pixel_arrays.append(self.images[i]['unnormalized_image_array'])
+            # if just_normalize_cropped_knees:
+            #     if self.images[i]['cropped_right_knee'] is not None:
+            #         all_pixel_arrays.append(self.images[i]['cropped_right_knee'])
+            #         all_pixel_arrays.append(self.images[i]['cropped_left_knee'])
+            # else:
+            all_pixel_arrays.append(self.images[i]['unnormalized_image_array'])
                 
         all_pixel_arrays = np.array(all_pixel_arrays)
         arr_max =  np.max(all_pixel_arrays)
         assert np.min(all_pixel_arrays) >= 0
         
-        if just_normalize_cropped_knees:
-            suffix = 'cropped_knee_only'
-        else:
-            suffix = 'full_image'
+        # if just_normalize_cropped_knees:
+        #     suffix = 'cropped_knee_only'
+        # else:
+        suffix = 'full_image'
 
         self.diacom_image_statistics['max_%s' % suffix] = 1.0*arr_max
 
         for i in range(len(self.images)):
-            if just_normalize_cropped_knees:
-                if self.images[i]['cropped_right_knee'] is not None:
-                    self.images[i]['cropped_right_knee'] = self.images[i]['cropped_right_knee'] / arr_max
-                    self.images[i]['cropped_left_knee'] = self.images[i]['cropped_left_knee'] / arr_max
-            else:
-                self.images[i]['image_array_scaled_to_zero_one'] = self.images[i]['unnormalized_image_array'] / arr_max
+            # if just_normalize_cropped_knees:
+            #     if self.images[i]['cropped_right_knee'] is not None:
+            #         self.images[i]['cropped_right_knee'] = self.images[i]['cropped_right_knee'] / arr_max
+            #         self.images[i]['cropped_left_knee'] = self.images[i]['cropped_left_knee'] / arr_max
+            # else:
+            self.images[i]['image_array_scaled_to_zero_one'] = self.images[i]['unnormalized_image_array'] / arr_max
         self.diacom_image_statistics['mean_of_zero_one_data_%s' % suffix] = np.mean(all_pixel_arrays) / arr_max
         self.diacom_image_statistics['std_of_zero_one_data_%s' % suffix] = np.std(all_pixel_arrays) / arr_max
         for k in self.diacom_image_statistics.keys():
@@ -860,7 +864,8 @@ def write_out_individual_images_for_one_dataset(write_out_image_data,
     So, after loading the whole image dataset, we also write out each image into a separate file. 
     We save the images several different ways -- with different preprocessing and downsampling sizes. 
     Checked. 
-    """    
+    """
+    print("write_out_individual_images_for_one_dataset")
     image_dataset_kwargs = copy.deepcopy(IMAGE_DATASET_KWARGS)
     image_dataset_kwargs['reprocess_all_images'] = False
     image_dataset_kwargs['use_small_data'] = False
@@ -870,42 +875,47 @@ def write_out_individual_images_for_one_dataset(write_out_image_data,
     image_dataset_kwargs['crop_to_just_the_knee'] = crop_to_just_the_knee
     image_dataset = XRayImageDataset(**image_dataset_kwargs)
     for dataset in ['train', 'val', 'test', 'BLINDED_HOLD_OUT_DO_NOT_USE']:
-        print("Writing out individual images for %s" % dataset)
+        print("Writing out individual images for dataset %s" % dataset)
         base_path = get_base_dir_for_individual_image(dataset=dataset, 
                                                       show_both_knees_in_each_image=show_both_knees_in_each_image, 
                                                       downsample_factor_on_reload=downsample_factor_on_reload, 
                                                       normalization_method=normalization_method, 
                                                       seed_to_further_shuffle_train_test_val_sets=seed_to_further_shuffle_train_test_val_sets, 
                                                       crop_to_just_the_knee=crop_to_just_the_knee)
-        if os.path.exists(base_path):
-            raise Exception('base path %s should not exist' % base_path)
-        time.sleep(3)
+        # if os.path.exists(base_path):         # note sure why this is needed???
+        #     raise Exception('base path %s should not exist' % base_path)
+        # time.sleep(3)
 
         while not os.path.exists(base_path):
-            # for some reason this command occasionally fails; make it more robust. 
-            os.system('mkdir %s' % base_path)
-            time.sleep(10)
+            os.system('mkdir -p %s' % base_path)    # the -p flag will create any directories not yet created in the path (leaving out -p will produce an error if subfolders are not yet created)
+            time.sleep(3)
 
         if dataset == 'BLINDED_HOLD_OUT_DO_NOT_USE':
             i_promise_i_really_want_to_use_the_blinded_hold_out_set = True
         else:
             i_promise_i_really_want_to_use_the_blinded_hold_out_set = False
 
+        print("non_image_data_processing.NonImageData")
         non_image_dataset = non_image_data_processing.NonImageData(what_dataset_to_use=dataset, 
                                                                    timepoints_to_filter_for=TIMEPOINTS_TO_FILTER_FOR, 
                                                                    seed_to_further_shuffle_train_test_val_sets=seed_to_further_shuffle_train_test_val_sets, 
                                                                    i_promise_i_really_want_to_use_the_blinded_hold_out_set=i_promise_i_really_want_to_use_the_blinded_hold_out_set)
+        print("match_image_dataset_to_non_image_dataset")
         combined_df, matched_images, image_codes = match_image_dataset_to_non_image_dataset(image_dataset, non_image_dataset)
+        print("ensure_barcodes_match")
         ensure_barcodes_match(combined_df, image_codes)
+        print("checking combined_df['visit']")
         assert combined_df['visit'].map(lambda x:x in TIMEPOINTS_TO_FILTER_FOR).all()
         
         non_image_csv_outfile = os.path.join(base_path, 'non_image_data.csv')
         combined_df.to_csv(non_image_csv_outfile)
+        print("should begin writing out image data")
         if write_out_image_data:
+            print("begin dumping the pickle")
             ensure_barcodes_match(combined_df, image_codes)
             pickle.dump(image_codes, open(os.path.join(base_path, 'image_codes.pkl'), 'wb'))
             for i in range(len(combined_df)):
-                image_path = os.path.join(base_path, 'image_%i.npy' % i)
+                image_path = os.path.join(base_path, 'image_%i.npy' % i)    # here we create images for each of our barcoded images
                 np.save(image_path, matched_images[i])
                 print("%s image %i/%i written out to %s" % (dataset, i + 1, len(combined_df), image_path))
     print("Successfully wrote out all images.")
@@ -1131,8 +1141,8 @@ class PytorchImagesDataset(Dataset):
                                                 seed_to_further_shuffle_train_test_val_sets=None, 
                                                 crop_to_just_the_knee=self.crop_to_just_the_knee)
                 non_image_data_from_dataset = pd.read_csv(os.path.join(base_dir_for_dataset, 'non_image_data.csv'), index_col=0)
-                image_codes_from_this_dataset = pickle.load(open(os.path.join(base_dir_for_dataset, 'image_codes.pkl'), 'rb'))
-                idxs_from_this_dataset = non_image_data_from_dataset['id'].map(lambda x:x in ids_we_are_using).values
+                image_codes_from_this_dataset = pickle.load(open(os.path.join(base_dir_for_dataset, 'image_codes.pkl'), 'rb'))  # load the image_codes.pkl file containing the list of image barcodes and image side
+                idxs_from_this_dataset = non_image_data_from_dataset['id'].map(lambda x:x in ids_we_are_using).values  # the id field in the non_image_data.csv file should correspond to the index of the array value in the image_codes.pkl file
                 self.non_image_data.append(non_image_data_from_dataset.loc[idxs_from_this_dataset])
                 self.image_codes += list(np.array(image_codes_from_this_dataset)[idxs_from_this_dataset])
 
@@ -1299,17 +1309,21 @@ class PytorchImagesDataset(Dataset):
         return sample
 
 if __name__ == '__main__':
+    print("starting the main image processing script")
     from traceback import print_exc
     import argparse
 
     parser = argparse.ArgumentParser()
     args = sys.argv
 
+    print("moved past ArgumentParser")
+    # sys.exit()  # stop things here for debugging
     def str2bool(x):
         assert x in ['True', 'False']
         return x == 'True'
 
     if len(sys.argv) > 1:
+        print("second image processing job")
         parser.add_argument('--write_out_image_data', type=str)
         parser.add_argument('--normalization_method', type=str)
         parser.add_argument('--show_both_knees_in_each_image', type=str)
@@ -1328,6 +1342,7 @@ if __name__ == '__main__':
                         seed_to_further_shuffle_train_test_val_sets=seed_to_further_shuffle_train_test_val_sets, 
                         crop_to_just_the_knee=str2bool(args.crop_to_just_the_knee))
     else:
+        print("first image processing job")
         image_dataset = XRayImageDataset(reprocess_all_images=True, show_both_knees_in_each_image=True, crop_to_just_the_knee=False, **IMAGE_DATASET_KWARGS)
         # DEPRECATED COMMENTS. 
         # Step 1: clear out old images on /dfs.
@@ -1345,7 +1360,3 @@ if __name__ == '__main__':
         #
         
     #compare_contents_files_to_loaded_images(image_dataset, IMAGE_DATASET_KWARGS['desired_image_type'])
-
-    
-
-
