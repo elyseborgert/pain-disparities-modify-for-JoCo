@@ -78,6 +78,10 @@ else:
     # Only need to set these paths if you are reprocessing raw data. 
     BASE_NON_IMAGE_DATA_DIR = os.getenv('BASE_NON_IMAGE_DATA_DIR') # Set this path to point to the directory where you downloaded the NON-IMAGE OAI data - eg, it should contain folders like "AllClinical_ASCII". 
         
+    while not os.path.exists(BASE_NON_IMAGE_DATA_DIR):
+        os.system('mkdir -p ' + BASE_NON_IMAGE_DATA_DIR)    # the -p flag will create any directories not yet created in the path (leaving out -p will produce an error if subfolders are not yet created)
+        time.sleep(3)
+
     BASE_IMAGE_DATA_DIR = os.getenv('BASE_IMAGE_DATA_DIR') # Set this path to point to the directory where you downloaded the IMAGE OAI data - eg, it should contain folders like "00m" for each timepoint. 
 
     FITTED_MODEL_DIR = os.getenv('FITTED_MODEL_DIR') # This is where you store the fitted models.  Please create three empty subdirectories in this directory: "configs", "results", and "model_weights". 
