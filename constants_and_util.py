@@ -82,6 +82,23 @@ else:
 
     FITTED_MODEL_DIR = os.getenv('FITTED_MODEL_DIR') # This is where you store the fitted models.  Please create three empty subdirectories in this directory: "configs", "results", and "model_weights". 
     
+    # create fitted model directories
+    while not os.path.exists(FITTED_MODEL_DIR):
+        os.system('mkdir -p ' + FITTED_MODEL_DIR) 
+        time.sleep(3)
+
+    while not os.path.exists(FITTED_MODEL_DIR + '/configs'):
+        os.system('mkdir -p ' + FITTED_MODEL_DIR + '/configs') 
+        time.sleep(3)
+
+    while not os.path.exists('' + FITTED_MODEL_DIR + '/results'):
+        os.system('mkdir -p ' + FITTED_MODEL_DIR + '/results')
+        time.sleep(3)
+
+    while not os.path.exists('' + FITTED_MODEL_DIR + '/model_weights'):
+        os.system('mkdir -p ' + FITTED_MODEL_DIR + '/model_weights')
+        time.sleep(3)
+
 assert os.path.exists(INDIVIDUAL_IMAGES_PATH), 'You need to set INDIVIDUAL_IMAGES_PATH; see "Please set these paths for your system" comment in constants_and_util.py'
 assert os.path.exists(FITTED_MODEL_DIR), 'You need to set FITTED_MODEL_DIR; see "Please set these paths for your system" comment in constants_and_util.py. After setting this directory, please create empty subdirectories called "configs", "results", and "model_weights" within it'
 assert os.path.exists(os.path.join(FITTED_MODEL_DIR, 'configs')) and os.path.exists(os.path.join(FITTED_MODEL_DIR, 'results')) and os.path.exists(os.path.join(FITTED_MODEL_DIR, 'model_weights')), 'Please create empty subdirectories called "configs","results", and "model_weights" within %s' % FITTED_MODEL_DIR
