@@ -440,10 +440,15 @@ class XRayImageDataset:
         try:
             arr_max =  np.max(all_pixel_arrays)
         except ValueError:  # raised if `max` is empty.
+            print("Oops! Looks like max might have been empty.")
             pass
 
-        assert np.min(all_pixel_arrays) >= 0
-        
+        try:
+            assert np.min(all_pixel_arrays) >= 0
+        except ValueError:  # raised if `min` is empty.
+            print("Oops! Looks like min might have been empty.")
+            pass
+
         # if just_normalize_cropped_knees:
         #     suffix = 'cropped_knee_only'
         # else:

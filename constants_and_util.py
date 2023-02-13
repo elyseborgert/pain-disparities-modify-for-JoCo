@@ -83,6 +83,7 @@ else:
         time.sleep(3)
 
     BASE_IMAGE_DATA_DIR = os.getenv('BASE_IMAGE_DATA_DIR') # Set this path to point to the directory where you downloaded the IMAGE OAI data - eg, it should contain folders like "00m" for each timepoint. 
+    print("BASE_IMAGE_DATA_DIR="+BASE_IMAGE_DATA_DIR)
 
     FITTED_MODEL_DIR = os.getenv('FITTED_MODEL_DIR') # This is where you store the fitted models.  Please create three empty subdirectories in this directory: "configs", "results", and "model_weights". 
     
@@ -112,13 +113,13 @@ if REPROCESS_RAW_DATA:
     assert os.path.exists(BASE_NON_IMAGE_DATA_DIR), 'If you are reprocessing raw data, you need to set BASE_NON_IMAGE_DATA_DIR; see "Please set these paths for your system" comment in constants_and_util.py'
     assert os.path.exists(BASE_IMAGE_DATA_DIR), 'If you are reprocessing raw data, you need to set BASE_IMAGE_DATA_DIR; see "Please set these paths for your system" comment in constants_and_util.py'
 
-RESAMPLED_IMAGE_SIZE = [1024, 1024]
+RESAMPLED_IMAGE_SIZE = os.getenv('RESAMPLED_IMAGE_SIZE')
 CROPPED_KNEE_RESAMPLED_IMAGE_SIZE = [int(0.5 * RESAMPLED_IMAGE_SIZE[0]), int(0.5 * RESAMPLED_IMAGE_SIZE[1])] # smaller because it's just the knee. 
                                      
 assert RESAMPLED_IMAGE_SIZE[0] == RESAMPLED_IMAGE_SIZE[1]
-IMAGE_DATASET_KWARGS = {'desired_image_type':'Bilateral PA Fixed Flexion Knee',
-                'normalization_method':'our_statistics',
-                'max_images_to_load':1000000000}
+
+IMAGE_DATASET_KWARGS = os.getenv('IMAGE_DATASET_KWARGS')
+
 GAPS_OF_INTEREST_COLS = ['race_black', 'binarized_income_at_least_50k', 'binarized_education_graduated_college', 'is_male']
 CLINICAL_CONTROL_COLUMNS = ['xrosfm', 'xrscfm','xrcyfm', 'xrjsm', 'xrchm','xrostm','xrsctm','xrcytm','xrattm','xrkl','xrosfl','xrscfl','xrcyfl', 'xrjsl','xrchl','xrostl','xrsctl','xrcytl','xrattl']
 OTHER_KOOS_PAIN_SUBSCORES = ['koos_function_score', 'koos_quality_of_life_score', 'koos_symptoms_score']
@@ -149,26 +150,10 @@ MEDICATION_CODES = {'V00RXACTM':'Acetaminophen',
                         'V00RXVLCXB':'Valdecoxib'
     }
 
-# Variables associated with enrollment visit are prefixed V00, variables at 12-month follow-up are prefixed V01, variables at 18-month interim visit are prefixed V02, variables at 24-month follow-up are prefixed V03, variables at 30-month follow-up are prefixed V04, variables at 36-month follow-up are prefixed V05, variables at 48-month follow-up visit are prefixed V06, variables at 72-month follow-up visit are prefixed V08, and variables at 96-month follow- up visit are prefixed V10.
-# Or see also the document ClinicalDataGettingStartedOverview.pdf
-CLINICAL_WAVES_TO_FOLLOWUP = {'00':'00 month follow-up: Baseline',
-'01':'12 month follow-up',
-'03':'24 month follow-up',
-'05':'36 month follow-up',
-'06':'48 month follow-up',
-'07':'60 month follow-up',
-'08':'72 month follow-up',
-'09':'84 month follow-up',
-'10':'96 month follow-up',
-'11':'108 month follow-up'}
-
-TIMEPOINTS_TO_FILTER_FOR = ['12 month follow-up', 
-                              '24 month follow-up', 
-                              '36 month follow-up', 
-                              '48 month follow-up', 
-                              '00 month follow-up: Baseline']
-
-WAVES_WE_ARE_USING = ['00', '01', '03', '05', '06']
+# variables associated with clinic visits we are analyzing
+CLINICAL_WAVES_TO_FOLLOWUP = os.getenv('CLINICAL_WAVES_TO_FOLLOWUP')
+TIMEPOINTS_TO_FILTER_FOR = os.getenv('TIMEPOINTS_TO_FILTER_FOR')
+WAVES_WE_ARE_USING = os.getenv('WAVES_WE_ARE_USING')
 
 assert set(TIMEPOINTS_TO_FILTER_FOR) == set([CLINICAL_WAVES_TO_FOLLOWUP[a] for a in WAVES_WE_ARE_USING])
 
@@ -179,18 +164,10 @@ TRAIN_VAL_TEST_HOLD_OUT_FRACTIONS = {'train_frac':(TOTAL_PEOPLE - 1500. - 1000.)
 
 assert TRAIN_VAL_TEST_HOLD_OUT_FRACTIONS['hold_out_frac'] <= 1500./TOTAL_PEOPLE # if you do change hold out set, must make it smaller. 
 
-
-IMAGE_TIMEPOINT_DIRS_TO_FOLLOWUP = {'00m':'00 month follow-up: Baseline', 
-'12m':'12 month follow-up', 
-'18m':'18 month follow-up', 
-'24m':'24 month follow-up', 
-'30m':'30 month follow-up', 
-'36m':'36 month follow-up', 
-'48m':'48 month follow-up', 
-'72m':'72 month follow-up', 
-'96m':'96 month follow-up'}
-KOOS_BINARIZATION_THRESH = 86.1
-WOMAC_BINARIZATION_THRESH = 3.
+# these are directories that should exist in the image processing directory
+IMAGE_TIMEPOINT_DIRS_TO_FOLLOWUP = os.getenv('IMAGE_TIMEPOINT_DIRS_TO_FOLLOWUP')
+KOOS_BINARIZATION_THRESH = os.getenv('KOOS_BINARIZATION_THRESH')
+WOMAC_BINARIZATION_THRESH = os.getenv('WOMAC_BINARIZATION_THRESH')
 
 AGE_RACE_SEX_SITE = ['C(age_at_visit)*C(p02sex)', 'C(p02hisp)', "C(p02race, Treatment(reference='1: White or Caucasian'))", 'C(v00site)']
 AGE_SEX_SITE_NO_RACE = ['C(age_at_visit)*C(p02sex)', 'C(v00site)']
