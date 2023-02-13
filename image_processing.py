@@ -215,6 +215,7 @@ class XRayImageDataset:
         for row in imagesList:
             # we assume the file path is the second column in the metadata file
             image_path=os.path.join(BASE_IMAGE_DATA_DIR, row[1])
+            print("image_path="+image_path)
             diacom_image = self.load_diacom_file(image_path, 
                     desired_image_type=self.desired_image_type)
             if diacom_image is not None:
