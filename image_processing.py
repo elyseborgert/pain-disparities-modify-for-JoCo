@@ -227,7 +227,6 @@ class XRayImageDataset:
                     'date':row[3], 
                     'image_series':image_series, 
                     'body_part':diacom_image.BodyPartExamined, 
-                    'series_description':diacom_image.SeriesDescription,
                     'unnormalized_image_array':image_array, 
                     # Users may also want to identify the specific image that was assessed to generate the data for an anatomic site and time point and merge the image assessment data with meta-data about that image (please see Appendix D for example SAS code). Individual images (radiographs, MRI series) are identified by a unique barcode. The barcode is recorded in the AccessionNumber in the DICOM header of the image.
                     'barcode':row[4]
