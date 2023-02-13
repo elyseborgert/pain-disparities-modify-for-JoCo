@@ -207,43 +207,31 @@ class XRayImageDataset:
         
     def load_all_images(self):
         """
-        loop over the nested subfolders + load images. 
+        Load DICOM images. Note we will read the image reference details from a CSV file so we are not relying on pulling image information from the DICOM header since writing a custom CSV file is easier than formatting DICOM headers to match this code
         """
         print("now in load_all_images()")
-        for timepoint_dir in get_directories(BASE_IMAGE_DATA_DIR):
-            print("timepoint_dir="+timepoint_dir)
-            if timepoint_dir not in IMAGE_TIMEPOINT_DIRS_TO_FOLLOWUP:
-                continue
-            # confirmed that this set of directories is consistent with website that provides information about data. 
-            base_dir_for_timepoint = os.path.join(BASE_IMAGE_DATA_DIR, timepoint_dir)
-            # for some reason some directories are nested -- /dfs/dataset/tmp/20180910-OAI/data/48m/48m/48m -- 
-            while timepoint_dir in get_directories(base_dir_for_timepoint):
-                print("%s directory is found in %s; concatenating and looking in the nested directory" % (timepoint_dir, base_dir_for_timepoint))
-                base_dir_for_timepoint = os.path.join(base_dir_for_timepoint, timepoint_dir)
-            for subject_folder in get_directories(base_dir_for_timepoint):
-                print("subject_folder="+subject_folder)
-                image_path = os.path.join(base_dir_for_timepoint,subject_folder)
-                diacom_image = self.load_diacom_file(image_path, 
+        # here we will read the MetaData.csv file to get the file paths
+        imagesList = pd.read_csv(os.path.join(BASE_IMAGE_DATA_DIR, METADATA_FILE), sep=METADATA_FILE_SEPARATOR)
+        for row in imagesList:
+            # we assume the file path is the second column in the metadata file
+            image_path=os.path.join(BASE_IMAGE_DATA_DIR, row[1])
+            diacom_image = self.load_diacom_file(image_path, 
                     desired_image_type=self.desired_image_type)
+            if diacom_image is not None:
+                image_array = self.get_resized_pixel_array_from_dicom_image(diacom_image)
+                # this section will depend on how the radiograph image DICOM header is organized
+                self.images.append({'timepoint':row[2], 
+                    'full_path':image_path,
+                    'subject':row[0], 
+                    'date':row[3], 
+                    'image_series':image_series, 
+                    'body_part':diacom_image.BodyPartExamined, 
+                    'series_description':diacom_image.SeriesDescription,
+                    'unnormalized_image_array':image_array, 
+                    # Users may also want to identify the specific image that was assessed to generate the data for an anatomic site and time point and merge the image assessment data with meta-data about that image (please see Appendix D for example SAS code). Individual images (radiographs, MRI series) are identified by a unique barcode. The barcode is recorded in the AccessionNumber in the DICOM header of the image.
+                    'barcode':row[4]
+                    })
 
-                if diacom_image is not None:
-                    image_array = self.get_resized_pixel_array_from_dicom_image(diacom_image)
-                    # this section will depend on how the radiograph image DICOM header is organized
-                    self.images.append({'timepoint_dir':timepoint_dir, 
-                        'full_path':image_path,
-                        'subject':subject_folder, 
-                        'visit':diacom_image.ClinicalTrialTimePointDescription,
-                        'id':int(participant), 
-                        'date':date, 
-                        'image_series':image_series, 
-                        'body_part':diacom_image.BodyPartExamined, 
-                        'series_description':diacom_image.SeriesDescription,
-                        'unnormalized_image_array':image_array, 
-                        # 'cropped_left_knee':cropped_left_knee, 
-                        # 'cropped_right_knee':cropped_right_knee,
-                        # Users may also want to identify the specific image that was assessed to generate the data for an anatomic site and time point and merge the image assessment data with meta-data about that image (please see Appendix D for example SAS code). Individual images (radiographs, MRI series) are identified by a unique barcode. The barcode is recorded in the AccessionNumber in the DICOM header of the image.
-                        'barcode':diacom_image.AccessionNumber
-                        })
     def plot_pipeline_examples(self, n_examples):
         """
         plot n_examples random images to make sure pipeline looks ok. 
