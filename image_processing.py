@@ -209,9 +209,9 @@ class XRayImageDataset:
         """
         loop over the nested subfolders + load images. 
         """
-        >&2 echo "now in load_all_images()"
+        echo "now in load_all_images()" >&2
         for timepoint_dir in get_directories(BASE_IMAGE_DATA_DIR):
-            >&2 echo "timepoint_dir="+timepoint_dir
+            echo "timepoint_dir="+timepoint_dir >&2
             if timepoint_dir not in IMAGE_TIMEPOINT_DIRS_TO_FOLLOWUP:
                 continue
             # confirmed that this set of directories is consistent with website that provides information about data. 
