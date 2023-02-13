@@ -219,18 +219,17 @@ class XRayImageDataset:
                 print("%s directory is found in %s; concatenating and looking in the nested directory" % (timepoint_dir, base_dir_for_timepoint))
                 base_dir_for_timepoint = os.path.join(base_dir_for_timepoint, timepoint_dir)
             for cohort_folder in get_directories(base_dir_for_timepoint):
-                # A value of "C" for letter [X] indicates that the images are from participants are in the initial 2686 participants in Group C of the OAI cohort, 
-                # and a value of "E" represents the remaining 2110 participants from the cohort.
-                print(cohort_folder)
-                if timepoint_dir in ['18m']:
-                    assert cohort_folder.split('.')[1] in ['D']
-                    assert len(get_directories(base_dir_for_timepoint)) == 1
-                elif timepoint_dir in ['30m']:
-                    assert cohort_folder.split('.')[1] in ['G']
-                    assert len(get_directories(base_dir_for_timepoint)) == 1
-                else:
-                    assert cohort_folder.split('.')[1] in ['C', 'E']
-                    assert len(get_directories(base_dir_for_timepoint)) == 2
+                # this section does not apply to JoCo
+                print("cohort_folder="+cohort_folder)
+                # if timepoint_dir in ['18m']:
+                #     assert cohort_folder.split('.')[1] in ['D']
+                #     assert len(get_directories(base_dir_for_timepoint)) == 1
+                # elif timepoint_dir in ['30m']:
+                #     assert cohort_folder.split('.')[1] in ['G']
+                #     assert len(get_directories(base_dir_for_timepoint)) == 1
+                # else:
+                #     assert cohort_folder.split('.')[1] in ['C', 'E']
+                #     assert len(get_directories(base_dir_for_timepoint)) == 2
                 participants = get_directories(os.path.join(base_dir_for_timepoint, 
                                                             cohort_folder))
                 for participant in participants:
