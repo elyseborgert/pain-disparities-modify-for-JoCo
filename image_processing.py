@@ -220,77 +220,29 @@ class XRayImageDataset:
             while timepoint_dir in get_directories(base_dir_for_timepoint):
                 print("%s directory is found in %s; concatenating and looking in the nested directory" % (timepoint_dir, base_dir_for_timepoint))
                 base_dir_for_timepoint = os.path.join(base_dir_for_timepoint, timepoint_dir)
-            for cohort_folder in get_directories(base_dir_for_timepoint):
-                # this section does not apply to JoCo
-                print("cohort_folder="+cohort_folder)
-                # if timepoint_dir in ['18m']:
-                #     assert cohort_folder.split('.')[1] in ['D']
-                #     assert len(get_directories(base_dir_for_timepoint)) == 1
-                # elif timepoint_dir in ['30m']:
-                #     assert cohort_folder.split('.')[1] in ['G']
-                #     assert len(get_directories(base_dir_for_timepoint)) == 1
-                # else:
-                #     assert cohort_folder.split('.')[1] in ['C', 'E']
-                #     assert len(get_directories(base_dir_for_timepoint)) == 2
-                participants = get_directories(os.path.join(base_dir_for_timepoint, 
-                                                            cohort_folder))
-                for participant in participants:
-                    participant_path = os.path.join(base_dir_for_timepoint, 
-                                               cohort_folder, 
-                                               participant)
-                    dates = get_directories(participant_path)
-                    # Each individual participant's folder contains subfolders for each date on which a participant had images 
-                    # (format of folder name is yyyymmdd).
-                    for date in dates:
-                        assert is_valid_date(date)
-                        date_path = os.path.join(base_dir_for_timepoint, 
-                                               cohort_folder, 
-                                               participant, 
-                                               date)
-                        # There is one more level of sub- folders below this level: 
-                        # one sub-folder for each image series acquired on that date. 
-                        # These sub-folders have unique 8-digit identifiers that are assigned 
-                        # to the image series in the central OAI imaging database maintained 
-                        # at Synarc, Inc. 
-                        # If the 8-digit identifier begins with 0 then the folder contains x-ray images, 
-                        # and if it starts with 1, then the folder contains MR images.
-                        all_image_series = get_directories(date_path)
-                        assert all([a[0] in ['0', '1'] for a in all_image_series])
-                        for image_series in all_image_series:
-                            is_xray = image_series[0] == '0'
-                            image_series_dir = os.path.join(date_path, 
-                                                    image_series)
-                            if is_xray:
-                                if len(self.images) >= self.max_images_to_load:
-                                    print("Loaded the maximum number of images: %i" % len(self.images))
-                                    return
-                                assert os.listdir(image_series_dir) == ['001']
-                                image_path = os.path.join(image_series_dir, '001')
-                                diacom_image = self.load_diacom_file(image_path, 
-                                    desired_image_type=self.desired_image_type)
+            for subject_folder in get_directories(base_dir_for_timepoint):
+                print("subject_folder="+subject_folder)
+                diacom_image = self.load_diacom_file(image_path, 
+                    desired_image_type=self.desired_image_type)
 
-                                
-                                if diacom_image is not None:
-                                    # cropped_left_knee, cropped_right_knee = self.crop_to_knee(image_path)
-                                    # if (cropped_left_knee is None) or (cropped_right_knee is None):
-                                    #     print("Warning: unable to crop knee image.")
-
-                                    image_array = self.get_resized_pixel_array_from_dicom_image(diacom_image)
-                                    self.images.append({'timepoint_dir':timepoint_dir, 
-                                        'full_path':image_path,
-                                        'cohort_folder':cohort_folder, 
-                                        'visit':diacom_image.ClinicalTrialTimePointDescription,
-                                        'id':int(participant), 
-                                        'date':date, 
-                                        'image_series':image_series, 
-                                        'body_part':diacom_image.BodyPartExamined, 
-                                        'series_description':diacom_image.SeriesDescription,
-                                        'unnormalized_image_array':image_array, 
-                                        # 'cropped_left_knee':cropped_left_knee, 
-                                        # 'cropped_right_knee':cropped_right_knee,
-                                        # Users may also want to identify the specific image that was assessed to generate the data for an anatomic site and time point and merge the image assessment data with meta-data about that image (please see Appendix D for example SAS code). Individual images (radiographs, MRI series) are identified by a unique barcode. The barcode is recorded in the AccessionNumber in the DICOM header of the image.
-                                        'barcode':diacom_image.AccessionNumber
-                                        })
+                if diacom_image is not None:
+                    image_array = self.get_resized_pixel_array_from_dicom_image(diacom_image)
+                    # this section will depend on how the radiograph image DICOM header is organized
+                    self.images.append({'timepoint_dir':timepoint_dir, 
+                        'full_path':image_path,
+                        'subject':subject_folder, 
+                        'visit':diacom_image.ClinicalTrialTimePointDescription,
+                        'id':int(participant), 
+                        'date':date, 
+                        'image_series':image_series, 
+                        'body_part':diacom_image.BodyPartExamined, 
+                        'series_description':diacom_image.SeriesDescription,
+                        'unnormalized_image_array':image_array, 
+                        # 'cropped_left_knee':cropped_left_knee, 
+                        # 'cropped_right_knee':cropped_right_knee,
+                        # Users may also want to identify the specific image that was assessed to generate the data for an anatomic site and time point and merge the image assessment data with meta-data about that image (please see Appendix D for example SAS code). Individual images (radiographs, MRI series) are identified by a unique barcode. The barcode is recorded in the AccessionNumber in the DICOM header of the image.
+                        'barcode':diacom_image.AccessionNumber
+                        })
     def plot_pipeline_examples(self, n_examples):
         """
         plot n_examples random images to make sure pipeline looks ok. 
