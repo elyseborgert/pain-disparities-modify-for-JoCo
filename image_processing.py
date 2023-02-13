@@ -222,6 +222,7 @@ class XRayImageDataset:
                 base_dir_for_timepoint = os.path.join(base_dir_for_timepoint, timepoint_dir)
             for subject_folder in get_directories(base_dir_for_timepoint):
                 print("subject_folder="+subject_folder)
+                image_path = os.path.join(timepoint_dir,subject_folder)
                 diacom_image = self.load_diacom_file(image_path, 
                     desired_image_type=self.desired_image_type)
 
