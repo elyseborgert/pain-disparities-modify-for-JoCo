@@ -34,7 +34,6 @@ from scipy.ndimage.filters import gaussian_filter
 from scipy.special import expit
 from matplotlib import ticker
 import gc
-import json
 import statsmodels.api as sm
 #import my_modified_resnet
 
