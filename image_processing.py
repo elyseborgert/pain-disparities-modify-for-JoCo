@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 from constants_and_util import *
 import matplotlib.pyplot as plt
-
+import gdcm
 import non_image_data_processing
 from scipy.stats import spearmanr
 from traceback import print_exc
