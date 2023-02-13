@@ -300,6 +300,7 @@ class XRayImageDataset:
         """
         resample the image to new_size. Checked. 
         """
+        print("resize_image")
         assert len(original_array.shape) == 2
         print("Resizing image from %s to %s" % (original_array.shape, new_size))
         new_array = cv2.resize(original_array, dsize=tuple(new_size), interpolation=cv2.INTER_CUBIC)
@@ -331,6 +332,7 @@ class XRayImageDataset:
         Extract pydicom pixel array and resize. Checked. 
         Per documentation, "The pixel_array property returns a NumPy array"
         """
+        print("get_resized_pixel_array_from_dicom_image")
         arr = self.resize_image(diacom_image.pixel_array, RESAMPLED_IMAGE_SIZE) * 1.0
         assert len(arr.shape) == 2
         return arr
