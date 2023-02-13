@@ -73,6 +73,7 @@ else:
     INDIVIDUAL_IMAGES_PATH = os.getenv('INDIVIDUAL_IMAGES_PATH') # points to the directory which stores the processed data, so you should download the processed data into this folder. If you are reprocessing the raw data, the individual images will be stored in this folder. 
     METADATA_FILE = os.getenv('METADATA_FILE')  # this file contains all of the reference data to our images
     METADATA_FILE_SEPARATOR = os.getenv('METADATA_FILE_SEPARATOR')  # the field separator for METADATA_FILE
+    
     while not os.path.exists(INDIVIDUAL_IMAGES_PATH):
         os.system('mkdir -p ' + INDIVIDUAL_IMAGES_PATH)    # the -p flag will create any directories not yet created in the path (leaving out -p will produce an error if subfolders are not yet created)
         time.sleep(3)

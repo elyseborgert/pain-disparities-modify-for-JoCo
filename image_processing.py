@@ -65,7 +65,6 @@ class XRayImageDataset:
     Class for loading data.
     """
     def __init__(self, 
-        desired_image_type, 
         normalization_method, 
         reprocess_all_images,
         show_both_knees_in_each_image,
@@ -76,7 +75,6 @@ class XRayImageDataset:
         downsample_factor_on_reload=None):
         """
         Creates the dataset. 
-        desired_image_type: the type of x-ray part you want (for example, Bilateral PA Fixed Flexion Knee)
         normalization_method: specifies how to z-score each image. 
         reprocess_all_images: whether to rerun the whole pipeline or just load the processed pkl. 
         make_plot: whether to plot a random sample of images. 
@@ -96,8 +94,6 @@ class XRayImageDataset:
         """
 
         self.images = []
-        self.desired_image_type = desired_image_type
-        assert self.desired_image_type == 'Bilateral PA Fixed Flexion Knee' # not sure pipeline will work for other body parts 
         self.normalization_method = normalization_method
         self.make_plot = make_plot
         self.reprocess_all_images = reprocess_all_images
@@ -216,8 +212,7 @@ class XRayImageDataset:
             # we assume the file path is the second column in the metadata file
             image_path=os.path.join(BASE_IMAGE_DATA_DIR, row[1])
             print("image_path="+image_path)
-            diacom_image = self.load_diacom_file(image_path, 
-                    desired_image_type=self.desired_image_type)
+            diacom_image = self.load_diacom_file(image_path)
             if diacom_image is not None:
                 image_array = self.get_resized_pixel_array_from_dicom_image(diacom_image)
                 # this section will depend on how the radiograph image DICOM header is organized
@@ -227,6 +222,7 @@ class XRayImageDataset:
                     'date':row[3], 
                     'image_series':image_series, 
                     'body_part':diacom_image.BodyPartExamined, 
+                    'series_description':diacom_image.SeriesDescription,
                     'unnormalized_image_array':image_array, 
                     # Users may also want to identify the specific image that was assessed to generate the data for an anatomic site and time point and merge the image assessment data with meta-data about that image (please see Appendix D for example SAS code). Individual images (radiographs, MRI series) are identified by a unique barcode. The barcode is recorded in the AccessionNumber in the DICOM header of the image.
                     'barcode':row[4]
@@ -310,16 +306,13 @@ class XRayImageDataset:
         new_array = cv2.resize(original_array, dsize=tuple(new_size), interpolation=cv2.INTER_CUBIC)
         return new_array
 
-    def load_diacom_file(self, filename, desired_image_type):
+    def load_diacom_file(self, filename):
         """
         load a matplotlib array from the pydicom file filename. Checked. 
         Drawn heavily from this documentation example: 
         https://pydicom.github.io/pydicom/stable/auto_examples/input_output/plot_read_dicom.html#sphx-glr-auto-examples-input-output-plot-read-dicom-py
         """
         dataset = pydicom.dcmread(filename)
-        
-        if dataset.SeriesDescription != desired_image_type:
-            return None
 
         print("Image %i" % len(self.images))
         print("Filename.........:", filename)
@@ -330,7 +323,7 @@ class XRayImageDataset:
         print("Modality.........: %s" % dataset.Modality)
         print("Study Date.......: %s" % dataset.StudyDate)
         print("Body part examined: %s" % dataset.BodyPartExamined)
-        print("Series description: %s" % dataset.SeriesDescription) # eg, Bilateral PA Fixed Flexion Knee
+        #print("Series description: %s" % dataset.SeriesDescription) # eg, Bilateral PA Fixed Flexion Knee
         print("Accession number: %s" % dataset.AccessionNumber) # this is the barcode. 
         print("ClinicalTrialTimePointDescription: %s" % dataset.ClinicalTrialTimePointDescription)
         print("ClinicalTrialTimePointID: %s" % dataset.ClinicalTrialTimePointID)
@@ -1309,5 +1302,4 @@ if __name__ == '__main__':
         #time.sleep(8 * 3600)
         
         #
-        
-    #compare_contents_files_to_loaded_images(image_dataset, IMAGE_DATASET_KWARGS['desired_image_type'])
+       
