@@ -212,7 +212,7 @@ class XRayImageDataset:
         print("now in load_all_images()")
         # here we will read the MetaData.csv file to get the file paths
         imagesList = pd.read_csv(os.path.join(BASE_IMAGE_DATA_DIR, METADATA_FILE), sep=METADATA_FILE_SEPARATOR, header=0)
-        for row in imagesList.iterrows():
+        for index, row in imagesList.iterrows():
             # we assume the file path is the second column in the metadata file
             image_path=os.path.join(BASE_IMAGE_DATA_DIR, row[1])
             print("image_path="+image_path)
