@@ -113,12 +113,12 @@ if REPROCESS_RAW_DATA:
     assert os.path.exists(BASE_NON_IMAGE_DATA_DIR), 'If you are reprocessing raw data, you need to set BASE_NON_IMAGE_DATA_DIR; see "Please set these paths for your system" comment in constants_and_util.py'
     assert os.path.exists(BASE_IMAGE_DATA_DIR), 'If you are reprocessing raw data, you need to set BASE_IMAGE_DATA_DIR; see "Please set these paths for your system" comment in constants_and_util.py'
 
-RESAMPLED_IMAGE_SIZE = os.getenv('RESAMPLED_IMAGE_SIZE')
+RESAMPLED_IMAGE_SIZE = json.loads(os.getenv('RESAMPLED_IMAGE_SIZE'))
 CROPPED_KNEE_RESAMPLED_IMAGE_SIZE = [int(0.5 * RESAMPLED_IMAGE_SIZE[0]), int(0.5 * RESAMPLED_IMAGE_SIZE[1])] # smaller because it's just the knee. 
                                      
 assert RESAMPLED_IMAGE_SIZE[0] == RESAMPLED_IMAGE_SIZE[1]
 
-IMAGE_DATASET_KWARGS = os.getenv('IMAGE_DATASET_KWARGS')
+IMAGE_DATASET_KWARGS = json.loads(os.getenv('IMAGE_DATASET_KWARGS'))
 
 GAPS_OF_INTEREST_COLS = ['race_black', 'binarized_income_at_least_50k', 'binarized_education_graduated_college', 'is_male']
 CLINICAL_CONTROL_COLUMNS = ['xrosfm', 'xrscfm','xrcyfm', 'xrjsm', 'xrchm','xrostm','xrsctm','xrcytm','xrattm','xrkl','xrosfl','xrscfl','xrcyfl', 'xrjsl','xrchl','xrostl','xrsctl','xrcytl','xrattl']
@@ -151,9 +151,9 @@ MEDICATION_CODES = {'V00RXACTM':'Acetaminophen',
     }
 
 # variables associated with clinic visits we are analyzing
-CLINICAL_WAVES_TO_FOLLOWUP = os.getenv('CLINICAL_WAVES_TO_FOLLOWUP')
-TIMEPOINTS_TO_FILTER_FOR = os.getenv('TIMEPOINTS_TO_FILTER_FOR')
-WAVES_WE_ARE_USING = os.getenv('WAVES_WE_ARE_USING')
+CLINICAL_WAVES_TO_FOLLOWUP = json.loads(os.getenv('CLINICAL_WAVES_TO_FOLLOWUP'))
+TIMEPOINTS_TO_FILTER_FOR = json.loads(os.getenv('TIMEPOINTS_TO_FILTER_FOR'))
+WAVES_WE_ARE_USING = json.loads(os.getenv('WAVES_WE_ARE_USING'))
 
 assert set(TIMEPOINTS_TO_FILTER_FOR) == set([CLINICAL_WAVES_TO_FOLLOWUP[a] for a in WAVES_WE_ARE_USING])
 
@@ -165,7 +165,7 @@ TRAIN_VAL_TEST_HOLD_OUT_FRACTIONS = {'train_frac':(TOTAL_PEOPLE - 1500. - 1000.)
 assert TRAIN_VAL_TEST_HOLD_OUT_FRACTIONS['hold_out_frac'] <= 1500./TOTAL_PEOPLE # if you do change hold out set, must make it smaller. 
 
 # these are directories that should exist in the image processing directory
-IMAGE_TIMEPOINT_DIRS_TO_FOLLOWUP = os.getenv('IMAGE_TIMEPOINT_DIRS_TO_FOLLOWUP')
+IMAGE_TIMEPOINT_DIRS_TO_FOLLOWUP = json.loads(os.getenv('IMAGE_TIMEPOINT_DIRS_TO_FOLLOWUP'))
 KOOS_BINARIZATION_THRESH = os.getenv('KOOS_BINARIZATION_THRESH')
 WOMAC_BINARIZATION_THRESH = os.getenv('WOMAC_BINARIZATION_THRESH')
 
