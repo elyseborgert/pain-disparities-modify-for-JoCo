@@ -221,8 +221,7 @@ class XRayImageDataset:
                     'subject':row[0], 
                     'date':row[3], 
                     'image_series':image_series, 
-                    'body_part':diacom_image.BodyPartExamined, 
-                    'series_description':diacom_image.SeriesDescription,
+                    'body_part':diacom_image.BodyPartExamined,
                     'unnormalized_image_array':image_array, 
                     # Users may also want to identify the specific image that was assessed to generate the data for an anatomic site and time point and merge the image assessment data with meta-data about that image (please see Appendix D for example SAS code). Individual images (radiographs, MRI series) are identified by a unique barcode. The barcode is recorded in the AccessionNumber in the DICOM header of the image.
                     'barcode':row[4]
@@ -316,17 +315,6 @@ class XRayImageDataset:
 
         print("Image %i" % len(self.images))
         print("Filename.........:", filename)
-        pat_name = dataset.PatientName
-        display_name = pat_name.family_name + ", " + pat_name.given_name
-        print("Patient's name...: %s" % display_name)
-        print("Patient id.......: %s" % dataset.PatientID)
-        print("Modality.........: %s" % dataset.Modality)
-        print("Study Date.......: %s" % dataset.StudyDate)
-        print("Body part examined: %s" % dataset.BodyPartExamined)
-        #print("Series description: %s" % dataset.SeriesDescription) # eg, Bilateral PA Fixed Flexion Knee
-        print("Accession number: %s" % dataset.AccessionNumber) # this is the barcode. 
-        # print("ClinicalTrialTimePointDescription: %s" % dataset.ClinicalTrialTimePointDescription)
-        # print("ClinicalTrialTimePointID: %s" % dataset.ClinicalTrialTimePointID)
 
         if 'PixelData' in dataset:
             rows = int(dataset.Rows)
