@@ -332,7 +332,7 @@ class XRayImageDataset:
         Extract pydicom pixel array and resize. Checked. 
         Per documentation, "The pixel_array property returns a NumPy array"
         """
-        print("get_resized_pixel_array_from_dicom_image RESAMPLED_IMAGE_SIZE="+RESAMPLED_IMAGE_SIZE)
+        print("get_resized_pixel_array_from_dicom_image RESAMPLED_IMAGE_SIZE="+RESAMPLED_IMAGE_SIZE[0])
         arr = self.resize_image(diacom_image.pixel_array, RESAMPLED_IMAGE_SIZE) * 1.0
         assert len(arr.shape) == 2
         return arr
