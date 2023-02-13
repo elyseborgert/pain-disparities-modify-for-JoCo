@@ -325,8 +325,8 @@ class XRayImageDataset:
         print("Body part examined: %s" % dataset.BodyPartExamined)
         #print("Series description: %s" % dataset.SeriesDescription) # eg, Bilateral PA Fixed Flexion Knee
         print("Accession number: %s" % dataset.AccessionNumber) # this is the barcode. 
-        print("ClinicalTrialTimePointDescription: %s" % dataset.ClinicalTrialTimePointDescription)
-        print("ClinicalTrialTimePointID: %s" % dataset.ClinicalTrialTimePointID)
+        # print("ClinicalTrialTimePointDescription: %s" % dataset.ClinicalTrialTimePointDescription)
+        # print("ClinicalTrialTimePointID: %s" % dataset.ClinicalTrialTimePointID)
 
         if 'PixelData' in dataset:
             rows = int(dataset.Rows)
