@@ -219,8 +219,7 @@ class XRayImageDataset:
                 self.images.append({'timepoint':row[2], 
                     'full_path':image_path,
                     'subject':row[0], 
-                    'date':row[3], 
-                    'image_series':image_series, 
+                    'date':row[3],  
                     'body_part':diacom_image.BodyPartExamined,
                     'unnormalized_image_array':image_array, 
                     # Users may also want to identify the specific image that was assessed to generate the data for an anatomic site and time point and merge the image assessment data with meta-data about that image (please see Appendix D for example SAS code). Individual images (radiographs, MRI series) are identified by a unique barcode. The barcode is recorded in the AccessionNumber in the DICOM header of the image.
