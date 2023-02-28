@@ -207,24 +207,22 @@ class XRayImageDataset:
         """
         print("now in load_all_images()")
         # here we will read the MetaData.csv file to get the file paths
-        imagesList = pd.read_csv(os.path.join(BASE_IMAGE_DATA_DIR, METADATA_FILE), sep=METADATA_FILE_SEPARATOR, header=0)
-        for index, row in imagesList.iterrows():
-            # we assume the file path is the second column in the metadata file
-            image_path=os.path.join(BASE_IMAGE_DATA_DIR, row[1])
-            print("image_path="+image_path)
-            diacom_image = self.load_diacom_file(image_path)
-            if diacom_image is not None:
-                image_array = self.get_resized_pixel_array_from_dicom_image(diacom_image)
-                # this section will depend on how the radiograph image DICOM header is organized
-                self.images.append({'timepoint':row[2], 
-                    'full_path':image_path,
-                    'subject':row[0], 
-                    'date':row[3],  
-                    'body_part':diacom_image.BodyPartExamined,
-                    'unnormalized_image_array':image_array, 
-                    # Users may also want to identify the specific image that was assessed to generate the data for an anatomic site and time point and merge the image assessment data with meta-data about that image (please see Appendix D for example SAS code). Individual images (radiographs, MRI series) are identified by a unique barcode. The barcode is recorded in the AccessionNumber in the DICOM header of the image.
-                    'barcode':row[4]
-                    })
+        with open(os.path.join(BASE_IMAGE_DATA_DIR, METADATA_FILE)) as imagesList:
+            next(imagesList)    # this skips the header
+            for imgMetaData in imagesList:
+                # the file path found in the second column of the metadata file
+                image_path=os.path.join(BASE_IMAGE_DATA_DIR, imgMetaData[1])
+                print("image_path="+image_path)
+                diacom_image = self.load_diacom_file(image_path)
+                if diacom_image is not None:
+                    image_array = self.get_resized_pixel_array_from_dicom_image(diacom_image)
+                    self.images.append({'timepoint':imgMetaData[2], 
+                        'full_path':image_path,
+                        'subject':imgMetaData[0], 
+                        'date':imgMetaData[3],
+                        'unnormalized_image_array':image_array, 
+                        'barcode':imgMetaData[5]
+                        })
 
     def plot_pipeline_examples(self, n_examples):
         """
@@ -236,7 +234,7 @@ class XRayImageDataset:
             idx = random.choice(range(len(self.images)))
             plt.figure(figsize=[15, 5])
 
-            original_diacom_image = self.load_diacom_file(self.images[idx]['full_path'], self.images[idx]['series_description'])
+            original_diacom_image = self.load_diacom_file(self.images[idx]['full_path'])
             plt.subplot(131)
             plt.imshow(original_diacom_image.pixel_array, cmap='bone')
             plt.colorbar()
@@ -450,48 +448,6 @@ class XRayImageDataset:
                     mean_to_use, 
                     std_to_use)
                 self.images[i]['%s_knee_scaled_to_zero_one' % side] = None
-
-def compare_contents_files_to_loaded_images(image_dataset, series_description):
-    """
-    Sanity check: make sure the images we loaded are the images which are supposed to be there
-    according to the contents file. 
-    """
-    barcodes_in_image_dataset = [a['barcode'][5:] for a in image_dataset.images]
-    assert all([len(a) == 7 for a in barcodes_in_image_dataset])
-    # Every x-ray image has a unique 12 digit barcode associated with it and the first 5 digits are always 01660.
-    # so we look at the last 7 digits. 
-    assert len(barcodes_in_image_dataset) == len(set(barcodes_in_image_dataset))
-    barcodes_in_image_dataset = set(barcodes_in_image_dataset)
-    print("Total number of barcodes in image dataset: %i" % len(barcodes_in_image_dataset))
-    all_barcodes_in_contents_dir = set()                     
-    for image_timepoint_dir in sorted(IMAGE_TIMEPOINT_DIRS_TO_FOLLOWUP):
-        content_filename = os.path.join(BASE_IMAGE_DATA_DIR, image_timepoint_dir, 'contents.csv')
-        d = pd.read_csv(content_filename, dtype={'Barcode':str})
-        
-        d['SeriesDescription'] = d['SeriesDescription'].map(lambda x:x.strip())
-        d = d.loc[d['SeriesDescription'] == series_description]
-        # several contents files are, unfortunately, inconsistently formatted. 
-        if 'Barcode' not in d.columns:
-            d['Barcode'] = d['AccessionNumber'].map(lambda x:str(x)[4:])
-        elif image_timepoint_dir == '72m':
-            d['Barcode'] = d['Barcode'].map(lambda x:str(x)[4:])
-        else:
-            needs_leading_0 = d['Barcode'].map(lambda x:len(x) == 6)
-            d.loc[needs_leading_0, 'Barcode'] = '0' + d.loc[needs_leading_0, 'Barcode'] 
-        if len(d) > 0:
-            assert d['Barcode'].map(lambda x:len(x) == 7).all()
-            assert len(set(d['Barcode'])) == len(d)
-        all_barcodes_in_contents_dir = all_barcodes_in_contents_dir.union(set(d['Barcode']))
-        n_properly_loaded = d['Barcode'].map(lambda x:x in barcodes_in_image_dataset).sum()
-        
-        print("%-5i/%-5i images in %s match to our dataset" % (n_properly_loaded,
-                                                      len(d),
-                                                      content_filename))
-
-    print("Warning: The following images have barcodes in our dataset but do not appear in contents file")
-    print("This appears to be due to barcodes that differ by 1 in a very small number of images")
-    print([a for a in barcodes_in_image_dataset if a not in all_barcodes_in_contents_dir])
-    assert sum([a not in all_barcodes_in_contents_dir for a in barcodes_in_image_dataset]) <= 5
 
 def check_consistency_with_enrollees_table(image_dataset, non_image_dataset):
     """
