@@ -155,9 +155,10 @@ MEDICATION_CODES = {'V00RXACTM':'Acetaminophen',
                         'V00RXVIT_D':'Vitamin_D',
                         'V00RXVLCXB':'Valdecoxib'
     }
-print("constanduti-"+os.getenv('CLINICAL_WAVES_TO_FOLLOWUP'))
+
 # variables associated with clinic visits we are analyzing
 temp = os.getenv('CLINICAL_WAVES_TO_FOLLOWUP')
+print("constanduti-",temp)
 CLINICAL_WAVES_TO_FOLLOWUP = json.loads(temp)
 TIMEPOINTS_TO_FILTER_FOR = json.loads(os.getenv('TIMEPOINTS_TO_FILTER_FOR'))
 WAVES_WE_ARE_USING = json.loads(os.getenv('WAVES_WE_ARE_USING'))
