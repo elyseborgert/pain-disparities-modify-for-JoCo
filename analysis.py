@@ -1308,7 +1308,7 @@ def make_descriptive_stats_table(train_df, val_df, test_df):
     Descriptive stats for table 1 in paper. 
     """
     # Need to load original data to get original BMI + age, which we render as categorical in final data. 
-    all_clinical00 = pd.read_csv(os.path.join(BASE_NON_IMAGE_DATA_DIR, 'AllClinical_ASCII', 'AllClinical00.txt'), sep='|')
+    all_clinical00 = pd.read_csv(os.path.join(BASE_NON_IMAGE_DATA_DIR, BASELINE_CLINIC_DATA), sep=BASELINE_CLINIC_DATA_SEPARATOR)
     all_clinical00.columns = all_clinical00.columns.map(lambda x:x.lower())
     assert len(all_clinical00.columns) == len(set(all_clinical00.columns))
     print("allclinical00 has %i columns, %i rows" % (len(all_clinical00.columns), len(all_clinical00)))

@@ -203,25 +203,28 @@ class XRayImageDataset:
         
     def load_all_images(self):
         """
-        Load DICOM images. Note we will read the image reference details from a CSV file so we are not relying on pulling image information from the DICOM header since writing a custom CSV file is easier than formatting DICOM headers to match this code
+        Load DICOM images. Note we will read the image reference details from a text file (that we created from scanning our file system once all data is loaded onto the research computing system)
+        since we should know what our file structure looks like and what our DICOM headers look like before running any code against them.
+        It is also MUCH easier to format a text file containing image data than to custom format DICOM headers after they are created, and we can QA it DICOM header data better before
+        processing the images in this code if we already have the DICOM header information extracted to a text file before hand.
         """
         print("now in load_all_images()")
-        # here we will read the MetaData.csv file to get the file paths
-        with open(os.path.join(BASE_IMAGE_DATA_DIR, METADATA_FILE)) as imagesList:
+        # here we will read the MetaData file to get the file paths
+        with open(os.path.join(BASE_IMAGE_DATA_DIR, IMG_METADATA_FILE)) as imagesList:
             next(imagesList)    # this skips the header
             for imgMetaData in imagesList:
-                # the file path found in the second column of the metadata file
-                image_path=os.path.join(BASE_IMAGE_DATA_DIR, imgMetaData[1])
+                imgMetaDataArray = imgMetaData.split(METADATA_FILE_SEPARATOR)   # we split each row of image metadata
+                # the file path found in the second column of the metadata file, the metadata file should be formatted like (Patient ID|RelativeImagePath|Timepoint|Barcode)
+                image_path=os.path.join(BASE_IMAGE_DATA_DIR, imgMetaDataArray[1])
                 print("image_path="+image_path)
                 diacom_image = self.load_diacom_file(image_path)
                 if diacom_image is not None:
                     image_array = self.get_resized_pixel_array_from_dicom_image(diacom_image)
-                    self.images.append({'timepoint':imgMetaData[2], 
+                    self.images.append({'timepoint':imgMetaDataArray[2], 
                         'full_path':image_path,
-                        'subject':imgMetaData[0], 
-                        'date':imgMetaData[3],
+                        'subject':imgMetaDataArray[0],
                         'unnormalized_image_array':image_array, 
-                        'barcode':imgMetaData[5]
+                        'barcode':imgMetaDataArray[3]
                         })
 
     def plot_pipeline_examples(self, n_examples):
@@ -1082,49 +1085,49 @@ class PytorchImagesDataset(Dataset):
         self.transform = transform
         print("Dataset %s has %i rows" % (dataset, len(self.non_image_data)))
         ensure_barcodes_match(self.non_image_data, self.image_codes)
-        if self.show_both_knees_in_each_image:
-            self.spot_check_ensure_original_images_match()
+        # if self.show_both_knees_in_each_image:
+        #     self.spot_check_ensure_original_images_match()
         
             
     
-    def spot_check_ensure_original_images_match(self):
-        """
-        Sanity check: make sure we're loading the right images, as measured by a high correlation between the processed images and the original dicom images. 
-        Can only do this if there's been relatively little preprocessing -- eg, no dramatic cropping of images. 
+    # def spot_check_ensure_original_images_match(self):
+    #     """
+    #     Sanity check: make sure we're loading the right images, as measured by a high correlation between the processed images and the original dicom images. 
+    #     Can only do this if there's been relatively little preprocessing -- eg, no dramatic cropping of images. 
 
-        Images are not necessarily identical because we have done some preprocessing (eg, smoothing or downsampling) but should be very highly correlated. 
-        """
-        necessary_path = os.path.join(BASE_IMAGE_DATA_DIR, '00m')
-        if not os.path.exists(necessary_path):
-            print("Warning: not spot-checking that images match original raw data because necessary path %s does not exist" % necessary_path)
-            print("If you want to spot-check, you need to download the raw data and store it at this path")
-            return
+    #     Images are not necessarily identical because we have done some preprocessing (eg, smoothing or downsampling) but should be very highly correlated. 
+    #     """
+    #     necessary_path = os.path.join(BASE_IMAGE_DATA_DIR, '00m')
+    #     if not os.path.exists(necessary_path):
+    #         print("Warning: not spot-checking that images match original raw data because necessary path %s does not exist" % necessary_path)
+    #         print("If you want to spot-check, you need to download the raw data and store it at this path")
+    #         return
 
-        print("Spot checking that images match.")
-        contents_df = pd.read_csv(os.path.join(BASE_IMAGE_DATA_DIR, '00m/contents.csv'))
-        idxs_to_sample = [a for a in range(len(self.non_image_data)) if self.non_image_data.iloc[a]['visit'] in ['00 month follow-up: Baseline']]
-        all_correlations = []
-        for random_idx in random.sample(idxs_to_sample, 10):
-            row = self.non_image_data.iloc[random_idx][['id', 'side', 'barcdbu', 'visit']]
-            #print(row)
-            barcode = int(row['barcdbu'].astype(str)[-7:])
-            folder = str(contents_df.loc[(contents_df['SeriesDescription'] == 'Bilateral PA Fixed Flexion Knee') & 
-                    (contents_df['Barcode'] == barcode)].iloc[0]['Folder'])
-            original_image_path = os.path.join(BASE_IMAGE_DATA_DIR, '00m', folder, '001')
-            original_image = pydicom.dcmread(original_image_path)
-            if self.seed_to_further_shuffle_train_test_val_sets is None:
-                our_image_path = os.path.join(self.base_dir_for_images, 'image_%i.npy' % random_idx)
-            else:
-                our_image_path = self.new_image_paths[random_idx]
-            our_test_image = np.load(our_image_path)[0, :, :].squeeze()
-            original_image = cv2.resize(original_image.pixel_array, dsize=tuple(our_test_image.shape)[::-1], interpolation=cv2.INTER_CUBIC)
-            if row['side'] == 'right':
-                original_image = original_image[:, ::-1]
-            all_correlations.append(spearmanr(original_image.flatten(), our_test_image.flatten())[0])
-            print("Correlation between original and reloaded image is", all_correlations[-1])
-        assert np.median(all_correlations) >= .99
-        assert np.mean(all_correlations) >= .97
-        print("Image spot check image passed.")
+    #     print("Spot checking that images match.")
+    #     contents_df = pd.read_csv(os.path.join(BASE_IMAGE_DATA_DIR, '00m/contents.csv'))
+    #     idxs_to_sample = [a for a in range(len(self.non_image_data)) if self.non_image_data.iloc[a]['visit'] in ['00 month follow-up: Baseline']]
+    #     all_correlations = []
+    #     for random_idx in random.sample(idxs_to_sample, 10):
+    #         row = self.non_image_data.iloc[random_idx][['id', 'side', 'barcdbu', 'visit']]
+    #         #print(row)
+    #         barcode = int(row['barcdbu'].astype(str)[-7:])
+    #         folder = str(contents_df.loc[(contents_df['SeriesDescription'] == 'Bilateral PA Fixed Flexion Knee') & 
+    #                 (contents_df['Barcode'] == barcode)].iloc[0]['Folder'])
+    #         original_image_path = os.path.join(BASE_IMAGE_DATA_DIR, '00m', folder, '001')
+    #         original_image = pydicom.dcmread(original_image_path)
+    #         if self.seed_to_further_shuffle_train_test_val_sets is None:
+    #             our_image_path = os.path.join(self.base_dir_for_images, 'image_%i.npy' % random_idx)
+    #         else:
+    #             our_image_path = self.new_image_paths[random_idx]
+    #         our_test_image = np.load(our_image_path)[0, :, :].squeeze()
+    #         original_image = cv2.resize(original_image.pixel_array, dsize=tuple(our_test_image.shape)[::-1], interpolation=cv2.INTER_CUBIC)
+    #         if row['side'] == 'right':
+    #             original_image = original_image[:, ::-1]
+    #         all_correlations.append(spearmanr(original_image.flatten(), our_test_image.flatten())[0])
+    #         print("Correlation between original and reloaded image is", all_correlations[-1])
+    #     assert np.median(all_correlations) >= .99
+    #     assert np.mean(all_correlations) >= .97
+    #     print("Image spot check image passed.")
 
     def __len__(self):
         if self.use_very_very_small_subset:

@@ -33,6 +33,8 @@ TOTAL_PEOPLE = 4796
 N_BOOTSTRAPS = 1000
 
 if getpass.getuser() == 'emmap1':
+    """
+    # commented out as it does not appy to most users
     # Do not modify this code; it is the original logic the authors used to process the images/run models, maintained for reproducibility.
     REPROCESS_RAW_DATA = True # set this to False if you just want to work with the processed data, and don't need to reprocess it. 
     assert node_name in ['hyperion', 'hyperion2', 'hyperion3', 'rambo', 'trinity', 'turing1', 'turing2']
@@ -63,6 +65,7 @@ if getpass.getuser() == 'emmap1':
                 INDIVIDUAL_IMAGES_PATH = '/lfs/turing2/0/emmap1/oai_image_data/processed_image_data/'
         else:
             raise Exception("invalid place to store images for GPU")
+    """
 else:
     # Please modify variables / paths here by copying .env.template file to .env and updating the variables in the .env file
     if sys.version.split()[0] != '3.5.2':
@@ -70,16 +73,16 @@ else:
     REPROCESS_RAW_DATA = os.getenv('REPROCESS_RAW_DATA') # set this to False if you just want to work with the processed data, and don't need to reprocess it. 
     
     # Please set these paths for your system. 
-    INDIVIDUAL_IMAGES_PATH = os.getenv('INDIVIDUAL_IMAGES_PATH') # points to the directory which stores the processed data, so you should download the processed data into this folder. If you are reprocessing the raw data, the individual images will be stored in this folder. 
-    METADATA_FILE = os.getenv('METADATA_FILE')  # this file contains all of the reference data to our images
-    METADATA_FILE_SEPARATOR = os.getenv('METADATA_FILE_SEPARATOR')  # the field separator for METADATA_FILE
+    INDIVIDUAL_IMAGES_PATH = os.path.join(os.getenv('PROCESSED_DATA_DIR'),'individualImages') # points to the directory which stores the processed data, so you should download the processed data into this folder. If you are reprocessing the raw data, the individual images will be stored in this folder. 
+    IMG_METADATA_FILE = os.getenv('IMG_METADATA_FILE')  # this file contains all of the reference data to our images
+    IMG_METADATA_FILE_SEPARATOR = os.getenv('IMG_METADATA_FILE_SEPARATOR')  # the field separator for IMG_METADATA_FILE
     
     while not os.path.exists(INDIVIDUAL_IMAGES_PATH):
         os.system('mkdir -p ' + INDIVIDUAL_IMAGES_PATH)    # the -p flag will create any directories not yet created in the path (leaving out -p will produce an error if subfolders are not yet created)
         time.sleep(3)
 
     # Only need to set these paths if you are reprocessing raw data. 
-    BASE_NON_IMAGE_DATA_DIR = os.getenv('BASE_NON_IMAGE_DATA_DIR') # Set this path to point to the directory where you downloaded the NON-IMAGE OAI data - eg, it should contain folders like "AllClinical_ASCII". 
+    BASE_NON_IMAGE_DATA_DIR = os.getenv('BASE_NON_IMAGE_DATA_DIR') # Set this path to point to the directory where you downloaded the NON-IMAGE OAI data - eg, it should contain files like "AllClinical00.txt". 
         
     while not os.path.exists(BASE_NON_IMAGE_DATA_DIR):
         os.system('mkdir -p ' + BASE_NON_IMAGE_DATA_DIR)    # the -p flag will create any directories not yet created in the path (leaving out -p will produce an error if subfolders are not yet created)
@@ -88,7 +91,7 @@ else:
     BASE_IMAGE_DATA_DIR = os.getenv('BASE_IMAGE_DATA_DIR') # Set this path to point to the directory where you downloaded the IMAGE OAI data - eg, it should contain folders like "00m" for each timepoint. 
     print("BASE_IMAGE_DATA_DIR="+BASE_IMAGE_DATA_DIR)
 
-    FITTED_MODEL_DIR = os.getenv('FITTED_MODEL_DIR') # This is where you store the fitted models.  Please create three empty subdirectories in this directory: "configs", "results", and "model_weights". 
+    FITTED_MODEL_DIR = os.path.join(os.getenv('PROCESSED_DATA_DIR'),'fittedModels') # This is where you store the fitted models.  Please create three empty subdirectories in this directory: "configs", "results", and "model_weights". 
     
     # create fitted model directories
     while not os.path.exists(FITTED_MODEL_DIR):
@@ -295,7 +298,7 @@ def get_all_ids():
     """
     Gets all the ids from the clinical file. Checked. 
     """
-    full_path = os.path.join(BASE_NON_IMAGE_DATA_DIR, 'AllClinical_ASCII', 'AllClinical00.txt')
+    full_path = os.path.join(BASE_NON_IMAGE_DATA_DIR, BASELINE_CLINIC_DATA)
     d = pd.read_csv(full_path, sep='|')
     ids = sorted(list(d['ID'].values.astype(int)))
     assert len(set(ids)) == len(ids)

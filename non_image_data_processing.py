@@ -33,39 +33,14 @@ class NonImageData():
         self.seed_to_further_shuffle_train_test_val_sets = seed_to_further_shuffle_train_test_val_sets
         self.what_dataset_to_use = what_dataset_to_use
 
-        # we need to add some directories if they do not exist
-        while not os.path.exists(os.path.join(BASE_NON_IMAGE_DATA_DIR, 'AllClinical_ASCII')):
-            os.system('mkdir -p %s' % os.path.join(BASE_NON_IMAGE_DATA_DIR, 'AllClinical_ASCII'))
-            time.sleep(5)
-        while not os.path.exists(os.path.join(BASE_NON_IMAGE_DATA_DIR, 
-            'XRay_Image_Assessments_ASCII', 
-            'SemiQuant_Scoring_ASCII')):
-            os.system('mkdir -p %s' % os.path.join(BASE_NON_IMAGE_DATA_DIR, 
-            'XRay_Image_Assessments_ASCII', 
-            'SemiQuant_Scoring_ASCII'))
-            time.sleep(5)
-        while not os.path.exists(os.path.join(BASE_NON_IMAGE_DATA_DIR, 
-            'MR_ImageAssessment_ASCII', 
-            'SemiQuant_Scoring_ASCII')):
-            os.system('mkdir -p %s' % os.path.join(BASE_NON_IMAGE_DATA_DIR, 
-            'MR_ImageAssessment_ASCII', 
-            'SemiQuant_Scoring_ASCII'))
-            time.sleep(5)
-        while not os.path.exists(os.path.join(BASE_NON_IMAGE_DATA_DIR, 'XRay_MetaAnalysis_ASCII')):
-            os.system('mkdir -p %s' % os.path.join(BASE_NON_IMAGE_DATA_DIR, 'XRay_MetaAnalysis_ASCII'))
-            time.sleep(5)
-        while not os.path.exists(os.path.join(BASE_NON_IMAGE_DATA_DIR, 'MRI_MetaAnalysis_ASCII')):
-            os.system('mkdir -p %s' % os.path.join(BASE_NON_IMAGE_DATA_DIR, 'MRI_MetaAnalysis_ASCII'))
-            time.sleep(5)
-        self.clinical_base_dir = os.path.join(BASE_NON_IMAGE_DATA_DIR, 'AllClinical_ASCII')
-        self.semiquantitative_xray_dir = os.path.join(BASE_NON_IMAGE_DATA_DIR, 
-            'XRay_Image_Assessments_ASCII', 
-            'SemiQuant_Scoring_ASCII')
-        self.semiquantitative_mri_dir = os.path.join(BASE_NON_IMAGE_DATA_DIR, 
-            'MR_ImageAssessment_ASCII', 
-            'SemiQuant_Scoring_ASCII')
-        self.xray_metadata_dir = os.path.join(BASE_NON_IMAGE_DATA_DIR, 'XRay_MetaAnalysis_ASCII')
-        self.mri_metadata_dir = os.path.join(BASE_NON_IMAGE_DATA_DIR, 'MRI_MetaAnalysis_ASCII')
+        self.non_image_data_dir = BASE_NON_IMAGE_DATA_DIR
+        # self.semiquantitative_xray_dir = os.path.join(BASE_NON_IMAGE_DATA_DIR, SEMIQUANTITATIVE_XRAY_DATA)
+        # not used
+        # self.semiquantitative_mri_dir = os.path.join(BASE_NON_IMAGE_DATA_DIR, 
+        #     'MR_ImageAssessment_ASCII', 
+        #     'SemiQuant_Scoring_ASCII')
+        # self.xray_metadata_dir = os.path.join(BASE_NON_IMAGE_DATA_DIR, 'XRay_MetaAnalysis_ASCII')
+        # self.mri_metadata_dir = os.path.join(BASE_NON_IMAGE_DATA_DIR, 'MRI_MetaAnalysis_ASCII')
         self.original_dataframes = {} # store the original CSVs
         self.processed_dataframes = {} # store the processed data
         self.col_mappings = {}
@@ -190,15 +165,15 @@ class NonImageData():
             for c in self.processed_dataframes[k].columns:
                 assert self.processed_dataframes[k][c].map(lambda x:str(x) == self.missing_data_val).sum() == 0
 
-    def load_all_text_files_in_directory(self, base_dir, datasets_to_skip):
+    def load_all_text_files_in_directory(self, dataset_list, base_dir, datasets_to_skip):
         """
-        Given a base directory, and datasets to skip, loads in the relevant datasets to self.original_dataframes.
+        Given a list of files, the absolute path to the dataset, and datasets to skip, loads in the relevant datasets to self.original_dataframes.
         Column names + dataset names are stored in lowercase. 
         Checked. 
         """
-        print("Base directory: %s" % base_dir)
+        print("load_all_text_files_in_directory")
         skipped_datasets = [] # make sure we actually skipped all the datasets we want to skip. 
-        for filename in sorted(os.listdir(base_dir)):
+        for filename in sorted(dataset_list):
             if filename[-4:] == '.txt':
                 dataset_name = filename.replace('.txt', '').lower()
                 if dataset_name in datasets_to_skip:
@@ -254,7 +229,7 @@ class NonImageData():
     def load_clinical_data(self):
         print("\n***Loading all clinical data.")
         # skip allclinical02 and allclinical04 because they have very little data.
-        self.load_all_text_files_in_directory(self.clinical_base_dir, datasets_to_skip=['allclinical02', 'allclinical04'])
+        self.load_all_text_files_in_directory(self.non_image_data_dir, ALL_CLINIC_DATA, datasets_to_skip=[])
 
     def map_to_date(self, x):
         # sometimes X-ray dates are missing because, as documentation notes
@@ -1152,8 +1127,7 @@ class NonImageData():
 
 
         # Gender + race + site. 
-        enrollees_path = os.path.join(BASE_NON_IMAGE_DATA_DIR, 'General_ASCII')
-        self.load_all_text_files_in_directory(enrollees_path, datasets_to_skip=[])
+        self.load_all_text_files_in_directory(self.non_image_data_dir, BASELINE_ENROLLEES, datasets_to_skip=[])
         race_sex_site = copy.deepcopy(self.original_dataframes['enrollees'][['id', 'p02hisp', 'p02race', 'p02sex', 'v00site']])
 
 
@@ -1313,11 +1287,10 @@ class NonImageData():
         Load in all the semiquantitative x-ray ratings. 
         Checked.
         """
-        print("\n***Loading all semi-quantitative x-ray data.")
-        dataset_substring = 'kxr_sq_bu'
-        datasets_to_skip = [a.replace('.txt', '') for a in os.listdir(self.semiquantitative_xray_dir) if dataset_substring not in a and '.txt' in a]
-        self.load_all_text_files_in_directory(self.semiquantitative_xray_dir, datasets_to_skip=datasets_to_skip)
+        print("\n***Loading all semi-quantitative x-ray data (kxr_sq_bu).")
+        self.load_all_text_files_in_directory(self.non_image_data_dir, SEMIQUANTITATIVE_XRAY_DATA, datasets_to_skip=[])
         
+        # for a in self.timepoints_to_filter_for]):
         for dataset_name in sorted(self.original_dataframes):
             if dataset_substring in dataset_name:
                 # From the OAI notes: 
@@ -1438,20 +1411,20 @@ class NonImageData():
         self.processed_dataframes[dataset_substring] = combined_data
         self.clinical_xray_semiquantitative_cols = [a for a in self.processed_dataframes['kxr_sq_bu'] if a[0] == 'x']
 
-    def load_xray_metadata(self):
-        # Load raw x-ray metadata. Checked. Not being used at present. 
-        print("\n***Loading all x-ray metadata.")
-        self.load_all_text_files_in_directory(self.xray_metadata_dir, datasets_to_skip=[])
+    # def load_xray_metadata(self):
+    #     # Load raw x-ray metadata. Checked. Not being used at present. 
+    #     print("\n***Loading all x-ray metadata.")
+    #     self.load_all_text_files_in_directory(self.non_image_data_dir, self.xray_metadata_dir, datasets_to_skip=[])
     
-    def load_semiquantitative_mri_data(self):
-        # Load raw semiquantitative MRI data. Checked. Not being used at present. 
-        print("\n***Loading all semi-quantitative MRI data.")
-        self.load_all_text_files_in_directory(self.semiquantitative_mri_dir, datasets_to_skip=[])
+    # def load_semiquantitative_mri_data(self):
+    #     # Load raw semiquantitative MRI data. Checked. Not being used at present. 
+    #     print("\n***Loading all semi-quantitative MRI data.")
+    #     self.load_all_text_files_in_directory(self.non_image_data_dir, self.semiquantitative_mri_dir, datasets_to_skip=[])
 
-    def load_mri_metadata(self):
-        # Load raw MRI metadata. Checked. Not being used at present. 
-        print("\n***Loading all MRI metadata.")
-        self.load_all_text_files_in_directory(self.mri_metadata_dir, datasets_to_skip=[])
+    # def load_mri_metadata(self):
+    #     # Load raw MRI metadata. Checked. Not being used at present. 
+    #     print("\n***Loading all MRI metadata.")
+    #     self.load_all_text_files_in_directory(self.mri_metadata_dir, datasets_to_skip=[])
 
     def map_str_column_to_float(self, dataset_name, column):
         raise Exception("If you actually use this you need to check it.")
