@@ -213,7 +213,7 @@ class XRayImageDataset:
         with open(os.path.join(BASE_IMAGE_DATA_DIR, IMG_METADATA_FILE)) as imagesList:
             next(imagesList)    # this skips the header
             for imgMetaData in imagesList:
-                imgMetaDataArray = imgMetaData.split(METADATA_FILE_SEPARATOR)   # we split each row of image metadata
+                imgMetaDataArray = imgMetaData.split(IMG_METADATA_FILE_SEPARATOR)   # we split each row of image metadata
                 # the file path found in the second column of the metadata file, the metadata file should be formatted like (Patient ID|RelativeImagePath|Timepoint|Barcode)
                 image_path=os.path.join(BASE_IMAGE_DATA_DIR, imgMetaDataArray[1])
                 print("image_path="+image_path)
