@@ -91,11 +91,12 @@ else:
     BASE_IMAGE_DATA_DIR = os.getenv('BASE_IMAGE_DATA_DIR') # Set this path to point to the directory where you downloaded the IMAGE OAI data - eg, it should contain folders like "00m" for each timepoint. 
     print("BASE_IMAGE_DATA_DIR="+BASE_IMAGE_DATA_DIR)
 
+    biddpid=os.path.join(BASE_IMAGE_DATA_DIR, 'processed_image_data')
     # add processed_image_data directory if we have not manually added it
-    while not os.path.exists(BASE_IMAGE_DATA_DIR, 'processed_image_data'):
-        os.system('mkdir -p ' + BASE_IMAGE_DATA_DIR +'processed_image_data')    
+    while not os.path.exists(biddpid):
+        os.system('mkdir -p ' + biddpid)    
         time.sleep(3)
-        
+
     FITTED_MODEL_DIR = os.path.join(os.getenv('PROCESSED_DATA_DIR'),'fittedModels') # This is where you store the fitted models.  Please create three empty subdirectories in this directory: "configs", "results", and "model_weights". 
     
     # create fitted model directories
