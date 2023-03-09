@@ -174,11 +174,13 @@ class NonImageData():
         print("load_all_text_files_in_directory")
         skipped_datasets = [] # make sure we actually skipped all the datasets we want to skip. 
         for filename in sorted(dataset_list):
+            print("filename-",filename)
             if filename[-4:] == '.txt':
                 dataset_name = filename.replace('.txt', '').lower()
                 if dataset_name in datasets_to_skip:
                     skipped_datasets.append(dataset_name)
                     continue
+                print("dataset_name-",dataset_name)
                 full_path = os.path.join(base_dir, filename)
                 d = pd.read_csv(full_path, sep='|')
                 d.columns = d.columns.map(lambda x:x.lower())
@@ -199,7 +201,9 @@ class NonImageData():
         dataframes_to_concatenate = []
         expected_columns = None
         for dataset_name in sorted(self.original_dataframes):
+            print("dataset_name-",dataset_name)
             if dataset_substring in dataset_name:
+                print("dataset_substring-",dataset_substring)
                 visit_number = dataset_name.replace(dataset_substring, '') # this should be something like 00. 
                 if visit_numbers_to_skip is not None and visit_number in visit_numbers_to_skip:
                     continue
@@ -1292,8 +1296,8 @@ class NonImageData():
         
         # for a in self.timepoints_to_filter_for]):
         for dataset_name in sorted(self.original_dataframes):
+            print("in the for loop of load_semiquantitative_xray_data", dataset_name)
             if dataset_substring in dataset_name:
-                print("in the for loop of load_semiquantitative_xray_data", dataset_name)
                 # From the OAI notes: 
                 # Please note that although some participants are coded READPRJ=42, they are in fact participants in Project 37. Users should recode these participants from READPRJ=42 to READPRJ=37.
                 miscoded_project_idxs = self.original_dataframes[dataset_name]['readprj'] == 42
