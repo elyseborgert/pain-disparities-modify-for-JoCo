@@ -171,7 +171,7 @@ class NonImageData():
         Column names + dataset names are stored in lowercase. 
         Checked. 
         """
-        print("load_all_text_files_in_directory")
+        print("load_all_text_files_in_directory list-",str(dataset_list))
         skipped_datasets = [] # make sure we actually skipped all the datasets we want to skip. 
         for filename in sorted(dataset_list):
             print("filename-",filename)
