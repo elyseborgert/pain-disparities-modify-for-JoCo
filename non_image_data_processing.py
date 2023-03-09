@@ -1293,12 +1293,13 @@ class NonImageData():
         # for a in self.timepoints_to_filter_for]):
         for dataset_name in sorted(self.original_dataframes):
             if dataset_substring in dataset_name:
+                print("in the for loop of load_semiquantitative_xray_data", dataset_name)
                 # From the OAI notes: 
                 # Please note that although some participants are coded READPRJ=42, they are in fact participants in Project 37. Users should recode these participants from READPRJ=42 to READPRJ=37.
                 miscoded_project_idxs = self.original_dataframes[dataset_name]['readprj'] == 42
                 self.original_dataframes[dataset_name].loc[miscoded_project_idxs, 'readprj'] = 37
                 self.original_dataframes[dataset_name]['side'] = self.original_dataframes[dataset_name]['side'].map(lambda x:self.side_mappings[x])
-        combined_data = self.concatenate_dataframes_from_multiple_timepoints(dataset_substring)
+        combined_data = self.concatenate_dataframes_from_multiple_timepoints('allclinical') # changing this from `dataset_substring` since that value does not make sense outside of the for loop
         
         # drop a very small number of rows with weird barcodes. 
         print("prior to dropping semiquantitative data missing a barcode, %i rows" % len(combined_data))
