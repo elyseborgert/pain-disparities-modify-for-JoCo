@@ -165,7 +165,7 @@ class NonImageData():
             for c in self.processed_dataframes[k].columns:
                 assert self.processed_dataframes[k][c].map(lambda x:str(x) == self.missing_data_val).sum() == 0
 
-    def load_all_text_files_in_directory(self, dataset_list, base_dir, datasets_to_skip):
+    def load_all_text_files_in_directory(self, base_dir, dataset_list, datasets_to_skip):
         """
         Given a list of files, the absolute path to the dataset, and datasets to skip, loads in the relevant datasets to self.original_dataframes.
         Column names + dataset names are stored in lowercase. 
