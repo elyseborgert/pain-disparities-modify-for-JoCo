@@ -1291,6 +1291,7 @@ class NonImageData():
         Load in all the semiquantitative x-ray ratings. 
         Checked.
         """
+        dataset_substring = 'kxr_sq_bu'
         print("\n***Loading all semi-quantitative x-ray data (kxr_sq_bu).")
         self.load_all_text_files_in_directory(self.non_image_data_dir, SEMIQUANTITATIVE_XRAY_DATA, datasets_to_skip=[])
         
@@ -1303,7 +1304,7 @@ class NonImageData():
                 miscoded_project_idxs = self.original_dataframes[dataset_name]['readprj'] == 42
                 self.original_dataframes[dataset_name].loc[miscoded_project_idxs, 'readprj'] = 37
                 self.original_dataframes[dataset_name]['side'] = self.original_dataframes[dataset_name]['side'].map(lambda x:self.side_mappings[x])
-        combined_data = self.concatenate_dataframes_from_multiple_timepoints('allclinical') # changing this from `dataset_substring` since that value does not make sense outside of the for loop
+        combined_data = self.concatenate_dataframes_from_multiple_timepoints(dataset_substring)
         
         # drop a very small number of rows with weird barcodes. 
         print("prior to dropping semiquantitative data missing a barcode, %i rows" % len(combined_data))
