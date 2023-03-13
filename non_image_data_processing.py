@@ -233,7 +233,7 @@ class NonImageData():
     def load_clinical_data(self):
         print("\n***Loading all clinical data.")
         # skip allclinical02 and allclinical04 because they have very little data.
-        self.load_all_text_files_in_directory(self, self.non_image_data_dir, ALL_CLINIC_DATA, datasets_to_skip=[])
+        self.load_all_text_files_in_directory(self.non_image_data_dir, ALL_CLINIC_DATA, datasets_to_skip=[])
 
     def map_to_date(self, x):
         # sometimes X-ray dates are missing because, as documentation notes
@@ -1131,7 +1131,7 @@ class NonImageData():
 
 
         # Gender + race + site. 
-        self.load_all_text_files_in_directory(self, self.non_image_data_dir, BASELINE_ENROLLEES, datasets_to_skip=[])
+        self.load_all_text_files_in_directory(self.non_image_data_dir, BASELINE_ENROLLEES, datasets_to_skip=[])
         race_sex_site = copy.deepcopy(self.original_dataframes['enrollees'][['id', 'p02hisp', 'p02race', 'p02sex', 'v00site']])
 
 
@@ -1292,7 +1292,7 @@ class NonImageData():
         Checked.
         """
         print("\n***Loading all semi-quantitative x-ray data (kxr_sq_bu).")
-        self.load_all_text_files_in_directory(self, self.non_image_data_dir, SEMIQUANTITATIVE_XRAY_DATA, datasets_to_skip=[])
+        self.load_all_text_files_in_directory(self.non_image_data_dir, SEMIQUANTITATIVE_XRAY_DATA, datasets_to_skip=[])
         
         # for a in self.timepoints_to_filter_for]):
         for dataset_name in sorted(self.original_dataframes):
@@ -1419,17 +1419,17 @@ class NonImageData():
     # def load_xray_metadata(self):
     #     # Load raw x-ray metadata. Checked. Not being used at present. 
     #     print("\n***Loading all x-ray metadata.")
-    #     self.load_all_text_files_in_directory(self, self.non_image_data_dir, self.xray_metadata_dir, datasets_to_skip=[])
+    #     self.load_all_text_files_in_directory(self.non_image_data_dir, self.xray_metadata_dir, datasets_to_skip=[])
     
     # def load_semiquantitative_mri_data(self):
     #     # Load raw semiquantitative MRI data. Checked. Not being used at present. 
     #     print("\n***Loading all semi-quantitative MRI data.")
-    #     self.load_all_text_files_in_directory(self, self.non_image_data_dir, self.semiquantitative_mri_dir, datasets_to_skip=[])
+    #     self.load_all_text_files_in_directory(self.non_image_data_dir, self.semiquantitative_mri_dir, datasets_to_skip=[])
 
     # def load_mri_metadata(self):
     #     # Load raw MRI metadata. Checked. Not being used at present. 
     #     print("\n***Loading all MRI metadata.")
-    #     self.load_all_text_files_in_directory(self, self.mri_metadata_dir, datasets_to_skip=[])
+    #     self.load_all_text_files_in_directory(self.mri_metadata_dir, datasets_to_skip=[])
 
     def map_str_column_to_float(self, dataset_name, column):
         raise Exception("If you actually use this you need to check it.")
