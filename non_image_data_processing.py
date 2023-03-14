@@ -81,7 +81,7 @@ class NonImageData():
         self.make_age_dataframe()
         self.make_dominant_leg_dataframe()
         self.make_previous_fracture_or_fall_dataframe()
-        self.make_processed_mri_data()
+        # self.make_processed_mri_data()    # do not seem to be using this so commenting out
 
         # some validation. 
         self.validate_processed_data()
