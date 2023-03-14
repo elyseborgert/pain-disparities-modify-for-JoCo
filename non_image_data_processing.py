@@ -58,9 +58,9 @@ class NonImageData():
         # load various dataframes 
         self.load_clinical_data()
         self.load_semiquantitative_xray_data()
-        self.load_xray_metadata()
-        self.load_semiquantitative_mri_data()
-        self.load_mri_metadata()
+        # self.load_xray_metadata()
+        # self.load_semiquantitative_mri_data()
+        # self.load_mri_metadata()
 
         # make processed dataframes. 
         
