@@ -58,7 +58,7 @@ class NonImageData():
         # load various dataframes 
         self.load_clinical_data()
         self.load_semiquantitative_xray_data()
-        # self.load_xray_metadata()
+        self.load_xray_metadata()
         # self.load_semiquantitative_mri_data()
         # self.load_mri_metadata()
 
@@ -1417,11 +1417,11 @@ class NonImageData():
         self.processed_dataframes[dataset_substring] = combined_data
         self.clinical_xray_semiquantitative_cols = [a for a in self.processed_dataframes['kxr_sq_bu'] if a[0] == 'x']
 
-    # def load_xray_metadata(self):
-    #     # Load raw x-ray metadata. Checked. Not being used at present. 
-    #     print("\n***Loading all x-ray metadata.")
-    #     self.load_all_text_files_in_directory(self.non_image_data_dir, self.xray_metadata_dir, datasets_to_skip=[])
-    
+    def load_xray_metadata(self):
+        # Load raw x-ray metadata. Checked. Not being used at present. 
+        print("\n***Loading all x-ray metadata.")
+        self.load_all_text_files_in_directory(self.non_image_data_dir, ALL_XRAY_DATA, datasets_to_skip=[])
+
     # def load_semiquantitative_mri_data(self):
     #     # Load raw semiquantitative MRI data. Checked. Not being used at present. 
     #     print("\n***Loading all semi-quantitative MRI data.")

@@ -93,6 +93,7 @@ else:
     ALL_CLINIC_DATA = json.loads(os.getenv('ALL_CLINIC_DATA'))
     BASELINE_ENROLLEES = json.loads(os.getenv('BASELINE_ENROLLEES'))
     BASELINE_ENROLLEES_SEPARATOR = os.getenv('BASELINE_ENROLLEES_SEPARATOR')
+    ALL_XRAY_DATA = json.loads(os.getenv('ALL_XRAY_DATA'))
     SEMIQUANTITATIVE_XRAY_DATA = json.loads(os.getenv('SEMIQUANTITATIVE_XRAY_DATA'))
 
     BASE_IMAGE_DATA_DIR = os.getenv('BASE_IMAGE_DATA_DIR') # Set this path to point to the directory where you downloaded the IMAGE OAI data - eg, it should contain folders like "00m" for each timepoint. 
