@@ -801,16 +801,18 @@ def write_out_individual_images_for_one_dataset(write_out_image_data,
         
         non_image_csv_outfile = os.path.join(base_path, 'non_image_data.csv')
         combined_df.to_csv(non_image_csv_outfile)
-        print("should begin writing out image data")
+        print("should begin writing out individual image data")
+        ind_image_count = 0
         if write_out_image_data:
-            print("begin dumping the pickle")
+            print("begin dumping the pickle of image_codes=%s and combined_df=%s" % (len(image_codes),len(combined_df)))
             ensure_barcodes_match(combined_df, image_codes)
             pickle.dump(image_codes, open(os.path.join(base_path, 'image_codes.pkl'), 'wb'))
             for i in range(len(combined_df)):
                 image_path = os.path.join(base_path, 'image_%i.npy' % i)    # here we create images for each of our barcoded images
                 np.save(image_path, matched_images[i])
                 print("%s image %i/%i written out to %s" % (dataset, i + 1, len(combined_df), image_path))
-    print("Successfully wrote out all images.")
+                ind_image_count += 1
+    print("Wrote out %s individual images." % (ind_image_count))
 
 def write_out_image_datasets_in_parallel():
     """
