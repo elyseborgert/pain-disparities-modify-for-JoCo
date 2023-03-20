@@ -568,7 +568,7 @@ def match_image_dataset_to_non_image_dataset(image_dataset, non_image_dataset, s
 
         # this statement is strictly for debugging
         if i % 1000 == 0:
-            print('right_key=%i/ left_key=%i' % (right_key, left_key))
+            print('right_key=',right_key,'/ left_key=',left_key)
             print("1st set matched_images #",len(matched_images))
 
     combined_df['has_matched_image'] = [a is not None for a in matched_images]
