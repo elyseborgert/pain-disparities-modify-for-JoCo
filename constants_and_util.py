@@ -540,11 +540,15 @@ def match_image_dataset_to_non_image_dataset(image_dataset, non_image_dataset, s
     print("After filtering for images that pass QC, %i images" % len(clinical_assessments)) # this doesn't filter out a lot of clinical assessments, even though a lot of values in the xray01 etc datasets are NA, because those values are already filtered out of the kxr_sq_bu -- you can't assign image scores to an image which isn't available. 
     
     combined_df = get_combined_dataframe(non_image_dataset, clinical_assessments)
-    print("combined_df=", len(clinical_assessments))
+    print("clinical_assessments=", clinical_assessments.items()[:3])
+    print("combined_df=",combined_df.iloc[:3])      # print the first three rows of the dataframe
     non_image_keys = list(combined_df['barcdbu'].map(str) + '*' + combined_df['side'])
     non_image_keys = dict(zip(non_image_keys, range(len(non_image_keys))))
+    print("non_image_keys first three items=",list(non_image_keys.items())[:3])
     matched_images = [None for i in range(len(combined_df))]
+    print("matched_images init first three items=",matched_images.items()[:3])
     image_codes = [None for i in range(len(combined_df))]
+    print("match_image_dataset_to_non_image_dataset combined_df=",len(combined_df)," and matched_images=",len(matched_images)," and image_codes=",len(image_codes))
     for i in range(len(image_dataset.images)):
         if i % 1000 == 0:
             print('Image %i/%i' % (i, len(image_dataset.images)))   # after every thousand images print out the number that was processed
@@ -570,7 +574,7 @@ def match_image_dataset_to_non_image_dataset(image_dataset, non_image_dataset, s
         if i % 1000 == 0:
             print('right_key=',right_key,'/ left_key=',left_key)
             print("1st set matched_images #",len(matched_images))
-
+    print("matched_images second step first three items=",matched_images.items()[:3])
     combined_df['has_matched_image'] = [a is not None for a in matched_images]
     print("Fraction of clinical x-ray ratings with matched images")
     print(combined_df[['has_matched_image', 'visit', 'side']].groupby(['visit', 'side']).agg(['mean', 'sum']))
@@ -582,10 +586,12 @@ def match_image_dataset_to_non_image_dataset(image_dataset, non_image_dataset, s
     combined_df.index = range(len(combined_df))
     matched_images = [matched_images[i] for i in idxs_to_keep]
     image_codes = [image_codes[i] for i in idxs_to_keep]
-    print("2nd set matched_images #",len(matched_images))
-    print("2nd set image_codes #",len(image_codes))
+    print("matched_images third step first three items=",matched_images.items()[:3])
+    print("image_codes third step first three items=",image_codes.items()[:3])
+    # print("2nd set matched_images #",len(matched_images)) # these just output 0
+    # print("2nd set image_codes #",len(image_codes))
     ensure_barcodes_match(combined_df, image_codes)
-    print("Total number of images matched to clinical ratings: %i" % len(matched_images))
+    # print("Total number of images matched to clinical ratings: %i" % len(matched_images)) # just outputs 0
     assert all([a is not None for a in matched_images])
     assert combined_df['has_matched_image'].all()
     return combined_df, matched_images, image_codes
