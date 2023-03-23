@@ -1057,7 +1057,8 @@ class PytorchImagesDataset(Dataset):
 
         if self.additional_features_to_predict is not None:
             self.additional_feature_array = copy.deepcopy(self.non_image_data[self.additional_features_to_predict].values)
-            print("self.additional_features_to_predict", str(self.additional_features_to_predict))
+            print("self.additional_features_to_predict -----", str(self.additional_features_to_predict))
+            print("self.additional_feature_array +++", str(self.additional_feature_array))
             for i in range(len(self.additional_features_to_predict)):
                 print("self.additional_feature_array[:, i] is ",str(self.additional_feature_array[:, i]), "and type=",type(self.additional_feature_array[:, i]))
                 if (self.additional_feature_array[:, i] == ''):
