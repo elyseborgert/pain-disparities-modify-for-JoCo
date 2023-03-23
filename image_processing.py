@@ -794,7 +794,8 @@ def write_out_individual_images_for_one_dataset(write_out_image_data,
                                                                    i_promise_i_really_want_to_use_the_blinded_hold_out_set=i_promise_i_really_want_to_use_the_blinded_hold_out_set)
         print("image_dataset type=", type(image_dataset.images))
         print("match_image_dataset_to_non_image_dataset image_dataset has ", image_dataset.images[:3])
-        print("match_image_dataset_to_non_image_dataset non_image_dataset has ", non_image_dataset.processed_dataframes[:3])
+       
+        print("match_image_dataset_to_non_image_dataset non_image_dataset has ", str(list(non_image_dataset.processed_dataframes.items())[:3]))
         combined_df, matched_images, image_codes = match_image_dataset_to_non_image_dataset(image_dataset, non_image_dataset)
         print("ensure_barcodes_match combined_df=",len(combined_df)," and matched_images=",len(matched_images)," and image_codes=",len(image_codes))
         ensure_barcodes_match(combined_df, image_codes)
