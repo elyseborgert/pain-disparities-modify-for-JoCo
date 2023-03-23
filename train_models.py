@@ -1,6 +1,7 @@
-import matplotlib
 import argparse
-#matplotlib.use('Agg')
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -10,7 +11,6 @@ import torch.nn.functional as F
 import numpy as np
 import torchvision
 from torchvision import datasets, models, transforms
-import matplotlib.pyplot as plt
 import seaborn as sns
 import time
 import random
