@@ -1057,15 +1057,12 @@ class PytorchImagesDataset(Dataset):
 
         if self.additional_features_to_predict is not None:
             self.additional_feature_array = copy.deepcopy(self.non_image_data[self.additional_features_to_predict].values)
-            print("self.additional_features_to_predict -----", str(self.additional_features_to_predict))
-            print("self.additional_feature_array +++", str(self.additional_feature_array))
+            print(str(self.non_image_data))
             if self.additional_feature_array:   # we need to make sure we are not working with an empty list
                 for i in range(len(self.additional_features_to_predict)):
-                    print("self.additional_feature_array[:, i] is ",str(self.additional_feature_array[:, i]), "and type=",type(self.additional_feature_array[:, i]))
-                    if (self.additional_feature_array[:, i] == ''):
-                        print("self.additional_feature_array empty value for i=",i)
-                    else:
-                        print("self.additional_feature_array should not be empty for for i=",i)
+                    # print("self.additional_feature_array[:, i] is ",str(self.additional_feature_array[:, i]), "and type=",type(self.additional_feature_array[:, i]))
+                    if (self.additional_feature_array[:, i] ):
+                        # print("self.additional_feature_array should not be empty for for i=",i)
                         not_nan = ~np.isnan(self.additional_feature_array[:, i])
                         std = np.std(self.additional_feature_array[not_nan, i], ddof=1)
                         mu = np.mean(self.additional_feature_array[not_nan, i])
