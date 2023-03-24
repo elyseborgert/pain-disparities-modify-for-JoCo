@@ -792,7 +792,8 @@ def write_out_individual_images_for_one_dataset(write_out_image_data,
                                                                    timepoints_to_filter_for=TIMEPOINTS_TO_FILTER_FOR, 
                                                                    seed_to_further_shuffle_train_test_val_sets=seed_to_further_shuffle_train_test_val_sets, 
                                                                    i_promise_i_really_want_to_use_the_blinded_hold_out_set=i_promise_i_really_want_to_use_the_blinded_hold_out_set)
-        image_dataset.images = [s.replace('\n', '') for s in image_dataset.images]  # this is a patch because for some reason there is a \n attached to the end of the barcode value which we probably should remove
+        image_dataset.images.update({"barcode": image_dataset.images["barcode"].replace("\n", "")}) # this is a patch for this dict object because for some reason there is a \n attached to the end of the barcode value which we probably should remove
+        
         print("image_dataset type=", type(image_dataset.images))
         print("match_image_dataset_to_non_image_dataset image_dataset has ", image_dataset.images[:3])
         print("we need to see what non_image_dataset looks like-",str(non_image_dataset.tolist()))
