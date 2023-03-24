@@ -452,48 +452,48 @@ class XRayImageDataset:
                     std_to_use)
                 self.images[i]['%s_knee_scaled_to_zero_one' % side] = None
 
-def check_consistency_with_enrollees_table(image_dataset, non_image_dataset):
-    """
-    Check consistency between the images we have and the images the enrollees table thinks we should have. 
-    THIS IS NOT CURRENTLY WORKING AND WE ARE NOT USING IT.
-    """
-    raise Exception("Not using at present because the enrollees data is weird and the image data shows good concordance with other files. If you use this, check it.")
-    print(Counter([a['visit'] for a in image_dataset.images]))
-    for timepoint in ['00', '01', '03', '05', '06', '08']:
-        df = copy.deepcopy(non_image_dataset.original_dataframes['enrollees'])
-        all_ids_in_enrollees_table = set(df['id'])
-        def has_knee_xray(s):
+# def check_consistency_with_enrollees_table(image_dataset, non_image_dataset):
+#     """
+#     Check consistency between the images we have and the images the enrollees table thinks we should have. 
+#     THIS IS NOT CURRENTLY WORKING AND WE ARE NOT USING IT.
+#     """
+#     raise Exception("Not using at present because the enrollees data is weird and the image data shows good concordance with other files. If you use this, check it.")
+#     print(Counter([a['visit'] for a in image_dataset.images]))
+#     for timepoint in ['00', '01', '03', '05', '06', '08']:
+#         df = copy.deepcopy(non_image_dataset.original_dataframes['enrollees'])
+#         all_ids_in_enrollees_table = set(df['id'])
+#         def has_knee_xray(s):
             
-            assert s in {'0: No', 
-                         '2: Yes, Knee Xray only', 
-                         '1: Yes, Knee MR only', 
-                         '.: Missing Form/Incomplete Workbook', 
-                         '3: Yes, Knee MR and knee xray'}
-            return s in ['2: Yes, Knee Xray only', '3: Yes, Knee MR and knee xray']
-        df['has_knee_xray'] = (df['v%simagesc' % timepoint].map(has_knee_xray) | 
-                               df['v%simagese' % timepoint].map(has_knee_xray))
-        people_who_should_have_xrays = set(list(df['id'].loc[df['has_knee_xray']].map(int)))
+#             assert s in {'0: No', 
+#                          '2: Yes, Knee Xray only', 
+#                          '1: Yes, Knee MR only', 
+#                          '.: Missing Form/Incomplete Workbook', 
+#                          '3: Yes, Knee MR and knee xray'}
+#             return s in ['2: Yes, Knee Xray only', '3: Yes, Knee MR and knee xray']
+#         df['has_knee_xray'] = (df['v%simagesc' % timepoint].map(has_knee_xray) | 
+#                                df['v%simagese' % timepoint].map(has_knee_xray))
+#         people_who_should_have_xrays = set(list(df['id'].loc[df['has_knee_xray']].map(int)))
         
-        # now figure out who actually does. 
-        people_who_actually_have_xrays = set()
-        timepoints_to_visit_names = {'00':'Screening Visit', 
-        '01':'12 month Annual Visit', 
-        '03':'24 month Annual Visit', 
-        '05':'36 month Annual Visit', 
-        '06':'48 month Annual Visit', 
-        '08':'72 month Annual Visit'}
-        for image in image_dataset.images:
-            if (image['visit'] == timepoints_to_visit_names[timepoint] and 
-                image['id'] in all_ids_in_enrollees_table):
-                people_who_actually_have_xrays.add(image['id'])
-        print("%i/%i who should have knee xrays at timepoint %s actually do" % (
-            len([a for a in people_who_should_have_xrays if a in people_who_actually_have_xrays]),
-            len(people_who_should_have_xrays),
-            timepoint))
-        have_ids_and_not_in_enrollees_table = [a for a in people_who_actually_have_xrays if a not in people_who_should_have_xrays]
-        if len(have_ids_and_not_in_enrollees_table) > 0:
-            print("Warning: %i people in our dataset has x-rays and does not appear in enrollees table as someone who should" % 
-                len(have_ids_and_not_in_enrollees_table))
+#         # now figure out who actually does. 
+#         people_who_actually_have_xrays = set()
+#         timepoints_to_visit_names = {'00':'Screening Visit', 
+#         '01':'12 month Annual Visit', 
+#         '03':'24 month Annual Visit', 
+#         '05':'36 month Annual Visit', 
+#         '06':'48 month Annual Visit', 
+#         '08':'72 month Annual Visit'}
+#         for image in image_dataset.images:
+#             if (image['visit'] == timepoints_to_visit_names[timepoint] and 
+#                 image['id'] in all_ids_in_enrollees_table):
+#                 people_who_actually_have_xrays.add(image['id'])
+#         print("%i/%i who should have knee xrays at timepoint %s actually do" % (
+#             len([a for a in people_who_should_have_xrays if a in people_who_actually_have_xrays]),
+#             len(people_who_should_have_xrays),
+#             timepoint))
+#         have_ids_and_not_in_enrollees_table = [a for a in people_who_actually_have_xrays if a not in people_who_should_have_xrays]
+#         if len(have_ids_and_not_in_enrollees_table) > 0:
+#             print("Warning: %i people in our dataset has x-rays and does not appear in enrollees table as someone who should" % 
+#                 len(have_ids_and_not_in_enrollees_table))
 
 class PretrainedTorchModel:
     """
@@ -792,9 +792,10 @@ def write_out_individual_images_for_one_dataset(write_out_image_data,
                                                                    timepoints_to_filter_for=TIMEPOINTS_TO_FILTER_FOR, 
                                                                    seed_to_further_shuffle_train_test_val_sets=seed_to_further_shuffle_train_test_val_sets, 
                                                                    i_promise_i_really_want_to_use_the_blinded_hold_out_set=i_promise_i_really_want_to_use_the_blinded_hold_out_set)
+        image_dataset.images = [s.replace('\n', '') for s in image_dataset.images]  # this is a patch because for some reason there is a \n attached to the end of the barcode value which we probably should remove
         print("image_dataset type=", type(image_dataset.images))
         print("match_image_dataset_to_non_image_dataset image_dataset has ", image_dataset.images[:3])
-        print("we need to see what non_image_dataset looks like-",str(non_image_dataset))
+        print("we need to see what non_image_dataset looks like-",str(non_image_dataset.tolist()))
         print("match_image_dataset_to_non_image_dataset non_image_dataset has ", str(non_image_dataset.processed_dataframes))
         combined_df, matched_images, image_codes = match_image_dataset_to_non_image_dataset(image_dataset, non_image_dataset)
         print("ensure_barcodes_match combined_df=",len(combined_df)," and matched_images=",len(matched_images)," and image_codes=",len(image_codes))
