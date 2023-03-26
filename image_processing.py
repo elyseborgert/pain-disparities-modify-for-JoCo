@@ -816,7 +816,7 @@ def write_out_individual_images_for_one_dataset(write_out_image_data,
         print("checking combined_df['visit']")
         assert combined_df['visit'].map(lambda x:x in TIMEPOINTS_TO_FILTER_FOR).all()
         
-        if combined_df:     # debugging only
+        if combined_df.empty != 0:     # debugging only
             print("combined_df=",str(combined_df)," and printing to =", os.path.join(base_path, 'non_image_data.csv'))
         non_image_csv_outfile = os.path.join(base_path, 'non_image_data.csv')
         combined_df.to_csv(non_image_csv_outfile)
