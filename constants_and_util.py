@@ -541,10 +541,10 @@ def match_image_dataset_to_non_image_dataset(image_dataset, non_image_dataset, s
     print("After filtering for images that pass QC, %i images" % len(clinical_assessments)) # this doesn't filter out a lot of clinical assessments, even though a lot of values in the xray01 etc datasets are NA, because those values are already filtered out of the kxr_sq_bu -- you can't assign image scores to an image which isn't available. 
     
     combined_df = get_combined_dataframe(non_image_dataset, clinical_assessments)
-    if clinical_assessments:    # debugging
-        print("clinical_assessments=", str(clinical_assessments[:3]))
-    if combined_df:             # debugging
-        print("combined_df=", str(combined_df[:3]))      # print the first three rows of the dataframe
+    # if clinical_assessments:    # debugging
+    print("clinical_assessments=", str(clinical_assessments))
+    #if combined_df:             # debugging
+    print("combined_df=", str(combined_df))      # print the first three rows of the dataframe
     non_image_keys = list(combined_df['barcdbu'].map(str) + '*' + combined_df['side'])
     print("non_image_keys list=",str(non_image_keys))
     non_image_keys = dict(zip(non_image_keys, range(len(non_image_keys))))
