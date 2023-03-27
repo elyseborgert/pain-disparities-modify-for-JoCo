@@ -1077,7 +1077,7 @@ class PytorchImagesDataset(Dataset):
             if len(self.additional_feature_array) != 0:   # we need to make sure we are not working with an empty list
                 for i in range(len(self.additional_features_to_predict)):
                     # print("self.additional_feature_array[:, i] is ",str(self.additional_feature_array[:, i]), "and type=",type(self.additional_feature_array[:, i]))
-                    if (self.additional_feature_array[:, i] ):
+                    if len(self.additional_feature_array[:, i]) != 0:
                         # print("self.additional_feature_array should not be empty for for i=",i)
                         not_nan = ~np.isnan(self.additional_feature_array[:, i])
                         std = np.std(self.additional_feature_array[not_nan, i], ddof=1)
