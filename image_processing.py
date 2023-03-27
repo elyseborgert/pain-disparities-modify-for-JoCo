@@ -1073,7 +1073,7 @@ class PytorchImagesDataset(Dataset):
 
         if self.additional_features_to_predict is not None:
             self.additional_feature_array = copy.deepcopy(self.non_image_data[self.additional_features_to_predict].values)
-            print("--- checking what is in self.non_image_data=",str(self.non_image_data))
+            #print("--- checking what is in self.non_image_data=",str(self.non_image_data))
             if self.additional_feature_array:   # we need to make sure we are not working with an empty list
                 for i in range(len(self.additional_features_to_predict)):
                     # print("self.additional_feature_array[:, i] is ",str(self.additional_feature_array[:, i]), "and type=",type(self.additional_feature_array[:, i]))
