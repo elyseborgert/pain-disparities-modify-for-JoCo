@@ -805,19 +805,19 @@ def write_out_individual_images_for_one_dataset(write_out_image_data,
                 else:
                     mylistnew.append(s)
         image_dataset.images=mylistnew
-        print("match_image_dataset_to_non_image_dataset image_dataset has ", str(image_dataset.images))
-        print("we need to see what non_image_dataset looks like-",str(non_image_dataset.original_dataframes))
-        print("match_image_dataset_to_non_image_dataset non_image_dataset has ", str(non_image_dataset.processed_dataframes))
+        # print("match_image_dataset_to_non_image_dataset image_dataset has ", str(image_dataset.images))
+        # print("we need to see what non_image_dataset looks like-",str(non_image_dataset.original_dataframes))
+        # print("match_image_dataset_to_non_image_dataset non_image_dataset has ", str(non_image_dataset.processed_dataframes))
         combined_df, matched_images, image_codes = match_image_dataset_to_non_image_dataset(image_dataset, non_image_dataset)
-        print("ensure_barcodes_match combined_df=",len(combined_df)," and matched_images=",len(matched_images)," and image_codes=",len(image_codes))
-        print("image_codes--",str(image_codes))
-        print("matched_images--",str(matched_images))
+        # print("ensure_barcodes_match combined_df=",len(combined_df)," and matched_images=",len(matched_images)," and image_codes=",len(image_codes))
+        # print("image_codes--",str(image_codes))
+        # print("matched_images--",str(matched_images))
         ensure_barcodes_match(combined_df, image_codes)
         print("checking combined_df['visit']")
         assert combined_df['visit'].map(lambda x:x in TIMEPOINTS_TO_FILTER_FOR).all()
         
-        if combined_df.empty != 0:     # debugging only
-            print("combined_df=",str(combined_df)," and printing to =", os.path.join(base_path, 'non_image_data.csv'))
+        # if combined_df.empty != 0:     # debugging only
+        #     print("combined_df=",str(combined_df)," and printing to =", os.path.join(base_path, 'non_image_data.csv'))
         non_image_csv_outfile = os.path.join(base_path, 'non_image_data.csv')
         combined_df.to_csv(non_image_csv_outfile)
         print("should begin writing out individual image data")

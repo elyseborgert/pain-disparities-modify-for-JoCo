@@ -542,17 +542,17 @@ def match_image_dataset_to_non_image_dataset(image_dataset, non_image_dataset, s
     
     combined_df = get_combined_dataframe(non_image_dataset, clinical_assessments)
     # if clinical_assessments:    # debugging
-    print("clinical_assessments=", str(clinical_assessments))
+    # print("clinical_assessments=", str(clinical_assessments))
     #if combined_df:             # debugging
-    print("combined_df=", str(combined_df))      # print the first three rows of the dataframe
+    #print("combined_df=", str(combined_df))      # print the first three rows of the dataframe
     non_image_keys = list(combined_df['barcdbu'].map(str) + '*' + combined_df['side'])
-    print("non_image_keys list=",str(non_image_keys))
+    #print("non_image_keys list=",str(non_image_keys))
     non_image_keys = dict(zip(non_image_keys, range(len(non_image_keys))))
-    print("non_image_keys dict=",str(non_image_keys))
+    #print("non_image_keys dict=",str(non_image_keys))
     matched_images = [None for i in range(len(combined_df))]
-    print("matched_images=", str(matched_images))
+    #print("matched_images=", str(matched_images))
     image_codes = [None for i in range(len(combined_df))]
-    print("match_image_dataset_to_non_image_dataset combined_df=",len(combined_df)," and matched_images=",len(matched_images)," and image_codes=",len(image_codes))
+    #print("match_image_dataset_to_non_image_dataset combined_df=",len(combined_df)," and matched_images=",len(matched_images)," and image_codes=",len(image_codes))
     for i in range(len(image_dataset.images)):
         if i % 1000 == 0:
             print('Image %i/%i' % (i, len(image_dataset.images)))   # after every thousand images print out the number that was processed
@@ -575,10 +575,10 @@ def match_image_dataset_to_non_image_dataset(image_dataset, non_image_dataset, s
             image_codes[idx] = right_key
 
         # this statement is strictly for debugging
-        if i % 1000 == 0:
-            print('right_key=',right_key,'/ left_key=',left_key)
-            print("1st set matched_images #",len(matched_images))
-    print("matched_images again=", str(matched_images))
+    #     if i % 1000 == 0:
+    #         print('right_key=',right_key,'/ left_key=',left_key)
+    #         print("1st set matched_images #",len(matched_images))
+    # print("matched_images again=", str(matched_images))
     combined_df['has_matched_image'] = [a is not None for a in matched_images]
     print("Fraction of clinical x-ray ratings with matched images")
     print(combined_df[['has_matched_image', 'visit', 'side']].groupby(['visit', 'side']).agg(['mean', 'sum']))
@@ -591,7 +591,7 @@ def match_image_dataset_to_non_image_dataset(image_dataset, non_image_dataset, s
     matched_images = [matched_images[i] for i in idxs_to_keep]
     image_codes = [image_codes[i] for i in idxs_to_keep]
     # print("matched_images third step first three items=",matched_images.items()[:3])
-    print("image_codes third step items=", str(image_codes))
+    # print("image_codes third step items=", str(image_codes))
     # print("2nd set matched_images #",len(matched_images)) # these just output 0
     # print("2nd set image_codes #",len(image_codes))
     ensure_barcodes_match(combined_df, image_codes)
