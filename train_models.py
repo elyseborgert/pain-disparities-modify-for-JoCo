@@ -628,9 +628,8 @@ class TransferLearningPytorchModel():
                 loss.backward()
                 self.optimizer.step()
             # statistics
-            print("checking loss.data=", str(loss.data))
-            if len(loss.data):
-                running_loss += loss.data[0] * inputs.size(0)
+            # print("checking loss.data=", str(loss.data))  # debug
+            running_loss += loss.data.item() * inputs.size(0)   # wpg - changed [0] to .item() since this is newer syntax
         
         epoch_loss = running_loss / dataset_sizes[phase]
         metrics_for_epoch = {}
