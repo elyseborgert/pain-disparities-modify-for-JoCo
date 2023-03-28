@@ -304,6 +304,7 @@ def rename_blinded_test_set_files(base_dir, inner_folder, running_for_real=False
 
 
 def binarize_koos(koos_arr):
+    print("binarize_koos with koos_arr=", str(koos_arr), " and KOOS_BINARIZATION_THRESH=", KOOS_BINARIZATION_THRESH)
     return 1.*(koos_arr <= KOOS_BINARIZATION_THRESH)
 
 def binarize_womac(womac_arr):
