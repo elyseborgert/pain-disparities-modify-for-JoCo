@@ -408,11 +408,13 @@ class TransferLearningPytorchModel():
         num_ftrs = self.model.fc.in_features
 
         if binary_prediction:
+            print("running binary_prediction")
             self.model.fc = nn.Linear(in_features=num_ftrs, out_features=2 + n_additional_image_features_to_predict) # reset final fully connected layer for two-class prediction. If we have additional features, include those as outputs from the fully connected layer. 
             self.loss_criterion = nn.CrossEntropyLoss()
             assert self.fully_connected_bias_initialization is None
 
         else:
+            print("not binary_prediction")
             self.model.fc = nn.Linear(in_features=num_ftrs, out_features=1 + n_additional_image_features_to_predict) # reset final fully connected layer and make it so it has a single output. 
             self.loss_criterion = nn.MSELoss()
             if self.fully_connected_bias_initialization is not None:
