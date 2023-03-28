@@ -552,9 +552,7 @@ class TransferLearningPytorchModel():
 
             # get the inputs
             inputs = data['image']
-            # labels = data['y']
-            labels = [_label.cuda() for _label in data['y']]
-
+            labels = data['y']
             additional_features_to_predict = data['additional_features_to_predict']
             additional_features_are_not_nan = data['additional_features_are_not_nan']
             one_hot_klg = data['klg'] # Note that this is a matrix (one-hot). 
@@ -576,9 +574,9 @@ class TransferLearningPytorchModel():
                     additional_features_are_not_nan = Variable(additional_features_are_not_nan.float().cuda())
                 one_hot_klg = Variable(one_hot_klg.float().cuda())
                 if self.binary_prediction: 
-                    labels = Variable(labels)
+                    labels = Variable(labels.long().cuda())
                 else:
-                    labels = Variable(labels)
+                    labels = Variable(labels.float().cuda())
             else:
                 raise Exception("Use a GPU, fool.")
 
