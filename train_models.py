@@ -574,9 +574,9 @@ class TransferLearningPytorchModel():
                     additional_features_are_not_nan = Variable(additional_features_are_not_nan.float().cuda())
                 one_hot_klg = Variable(one_hot_klg.float().cuda())
                 if self.binary_prediction: 
-                    labels = Variable(labels.long().cuda())
+                    labels = Variable(labels.unsqueeze(1).long().cuda())    # wpg - assuming I need `unsqueeze(1)` in this statement as well since I seem to need it in the following statement
                 else:
-                    labels = Variable(labels.unsqueeze(1).float().cuda())
+                    labels = Variable(labels.unsqueeze(1).float().cuda())   # wpg - added `unsqueeze(1)` because the labels list did not align with `outputs` below and was throwing an error at `loss = self.loss_criterion(input=outputs, target=labels)`
             else:
                 raise Exception("Use a GPU, fool.")
 
@@ -628,7 +628,9 @@ class TransferLearningPytorchModel():
                 loss.backward()
                 self.optimizer.step()
             # statistics
-            running_loss += loss.data[0] * inputs.size(0)
+            print("checking loss.data=", str(loss.data))
+            if len(loss.data):
+                running_loss += loss.data[0] * inputs.size(0)
         
         epoch_loss = running_loss / dataset_sizes[phase]
         metrics_for_epoch = {}
