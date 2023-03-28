@@ -576,7 +576,7 @@ class TransferLearningPytorchModel():
                 if self.binary_prediction: 
                     labels = Variable(labels.long().cuda())
                 else:
-                    labels = Variable(labels.float().cuda())
+                    labels = Variable(labels.unsqueeze(1).float().cuda())
             else:
                 raise Exception("Use a GPU, fool.")
 
@@ -598,7 +598,6 @@ class TransferLearningPytorchModel():
             if self.n_additional_image_features_to_predict > 0:
                 additional_feature_outputs = outputs[:, -self.n_additional_image_features_to_predict:]
                 outputs = outputs[:, :-self.n_additional_image_features_to_predict]
-                labels = labels[:, :-labels]
                 print("additional_feature_outputs on self.n_additional_image_features_to_predict > 0=",str(additional_feature_outputs)) # debug
                 print("outputs on self.n_additional_image_features_to_predict > 0=",str(outputs)) # debug
                 print("labels on self.n_additional_image_features_to_predict > 0=",str(labels)) # debug
