@@ -574,9 +574,9 @@ class TransferLearningPytorchModel():
                     additional_features_are_not_nan = Variable(additional_features_are_not_nan.float().cuda())
                 one_hot_klg = Variable(one_hot_klg.float().cuda())
                 if self.binary_prediction: 
-                    labels = Variable(labels.long().cuda())
+                    labels = [Variable(labels.long().cuda())]
                 else:
-                    labels = Variable(labels.float().cuda())
+                    labels = [Variable(labels.float().cuda())]
             else:
                 raise Exception("Use a GPU, fool.")
 
