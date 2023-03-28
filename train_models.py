@@ -417,7 +417,7 @@ class TransferLearningPytorchModel():
             self.loss_criterion = nn.MSELoss()
             if self.fully_connected_bias_initialization is not None:
                 # we do this for Koos pain subscore because otherwise the final layer ends up with all positive weights, and that's weird/hard to interpret.
-                nn.init.constant(self.model.fc.bias.data[:1], self.fully_connected_bias_initialization)
+                nn.init.constant_(self.model.fc.bias.data[:1], self.fully_connected_bias_initialization)
                 print("Bias has been initialized to")
                 print(self.model.fc.bias)
 
