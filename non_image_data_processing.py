@@ -89,24 +89,24 @@ class NonImageData():
 
         # make processed dataframes. 
         
-        self.make_nonstandard_interventions_dataframe()
-        self.make_medications_dataframe()
-        self.make_400m_walk_dataframe()
-        self.make_redundant_knee_xray_variable_dataframe()
+        #self.make_nonstandard_interventions_dataframe()
+        #self.make_medications_dataframe()
+        #self.make_400m_walk_dataframe()
+        #self.make_redundant_knee_xray_variable_dataframe()
         self.make_knee_pain_dataframe()
         self.make_other_koos_subscores_dataframe()
         self.make_per_person_controls_dataframe()
-        self.make_previous_injury_dataframe()
-        self.make_previous_surgery_dataframe()
-        self.make_previous_knee_replacement_dataframe()
-        self.make_bmi_dataframe()
-        self.make_drinking_and_smoking_dataframe()
-        self.make_medical_history_dataframe()
-        self.make_pain_dataframe_for_all_other_types_of_pain()
-        self.make_age_dataframe()
-        self.make_dominant_leg_dataframe()
-        self.make_previous_fracture_or_fall_dataframe()
-        self.make_processed_mri_data()
+        #self.make_previous_injury_dataframe()
+        #self.make_previous_surgery_dataframe()
+        #self.make_previous_knee_replacement_dataframe()
+        #self.make_bmi_dataframe()
+        #self.make_drinking_and_smoking_dataframe()
+        #self.make_medical_history_dataframe()
+        #self.make_pain_dataframe_for_all_other_types_of_pain()
+        #self.make_age_dataframe()
+        #self.make_dominant_leg_dataframe()
+        #self.make_previous_fracture_or_fall_dataframe()
+        #self.make_processed_mri_data()
 
         # some validation. 
         self.validate_processed_data()
@@ -1093,32 +1093,30 @@ class NonImageData():
         Checked. 
         """
         all_left_knee_pain_scores = self.concatenate_dataframes_from_multiple_timepoints(dataset_substring='allclinical', 
-            columns_to_subset_on=['id', 'kooskpl', 'womkpl'])
-        assert list(all_left_knee_pain_scores.columns) == ['id', 'kooskpl', 'womkpl', 'visit']
-        all_left_knee_pain_scores.columns = ['id', 'koos_pain_subscore', 'womac_pain_subscore', 'visit']
+            columns_to_subset_on=['id', 'womkpl'])
+        assert list(all_left_knee_pain_scores.columns) == ['id', 'womkpl', 'visit']
+        all_left_knee_pain_scores.columns = ['id', 'womac_pain_subscore', 'visit']
         all_left_knee_pain_scores['side'] = 'left'
 
         all_right_knee_pain_scores = self.concatenate_dataframes_from_multiple_timepoints(dataset_substring='allclinical', 
-            columns_to_subset_on=['id', 'kooskpr', 'womkpr'])
-        assert list(all_right_knee_pain_scores.columns) == ['id', 'kooskpr', 'womkpr', 'visit']
-        all_right_knee_pain_scores.columns = ['id', 'koos_pain_subscore', 'womac_pain_subscore', 'visit']
+            columns_to_subset_on=['id', 'womkpr'])
+        assert list(all_right_knee_pain_scores.columns) == ['id', 'womkpr', 'visit']
+        all_right_knee_pain_scores.columns = ['id','womac_pain_subscore', 'visit']
         all_right_knee_pain_scores['side'] = 'right'
         all_knee_pain_scores = pd.concat([all_left_knee_pain_scores, all_right_knee_pain_scores])
-        for k in ['koos_pain_subscore', 'womac_pain_subscore']:
+        for k in ['womac_pain_subscore']:
             all_knee_pain_scores[k] = all_knee_pain_scores[k].map(lambda x:float(x) if len(str(x).strip()) > 0 else None)
         print("Number of knee pain scores: %i" % len(all_knee_pain_scores))
-        print("Womac scores not missing data: %i; koos not missing data: %i" % (len(all_knee_pain_scores['koos_pain_subscore'].dropna()), 
-            len(all_knee_pain_scores['womac_pain_subscore'].dropna())))
+        print("Womac scores not missing data: %i % len(all_knee_pain_scores['womac_pain_subscore'].dropna())))
         for timepoint in sorted(list(set(all_knee_pain_scores['visit']))):
             df_for_timepoint = copy.deepcopy(all_knee_pain_scores.loc[all_knee_pain_scores['visit'] == timepoint])
-            print("Timepoint %s, fraction womac scores complete: %2.3f; koos scores complete %2.3f" % (timepoint, 
-                1 - pd.isnull(df_for_timepoint['womac_pain_subscore']).mean(), 
-                1 - pd.isnull(df_for_timepoint['koos_pain_subscore']).mean()))
+            print("Timepoint %s, fraction womac scores complete: %2.3f % (timepoint, 
+                1 - pd.isnull(df_for_timepoint['womac_pain_subscore']).mean())
 
         all_knee_pain_scores = all_knee_pain_scores.dropna()
         print("Number of knee pain scores not missing data: %i" % len(all_knee_pain_scores))
-        print("Correlation between KOOS and WOMAC scores is %2.3f" % pearsonr(all_knee_pain_scores['koos_pain_subscore'], 
-            all_knee_pain_scores['womac_pain_subscore'])[0])
+        #print("Correlation between KOOS and WOMAC scores is %2.3f" % pearsonr(all_knee_pain_scores['koos_pain_subscore'], 
+        #   all_knee_pain_scores['womac_pain_subscore'])[0])
         self.processed_dataframes['all_knee_pain_scores'] = all_knee_pain_scores
 
     def make_per_person_controls_dataframe(self):
@@ -1130,8 +1128,8 @@ class NonImageData():
         missing_data_val = self.missing_data_val
 
         # Income, education, marital status. Each row is one person. 
-        all_clinical00_d = copy.deepcopy(self.original_dataframes['allclinical00'][['id', 'v00income', 'v00edcv', 'v00maritst']])
-        for c in ['v00income', 'v00edcv']:
+        all_clinical00_d = copy.deepcopy(self.original_dataframes['allclinical00'][['id', 'v00edcv', 'v00maritst']])
+        for c in ['v00edcv']:
             val_counts = Counter(all_clinical00_d[c])
             for val in sorted(val_counts.keys()):
                 print('%-50s %2.1f%%' % (val, 100.*val_counts[val] / len(all_clinical00_d)))
