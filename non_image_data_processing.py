@@ -94,7 +94,7 @@ class NonImageData():
         #self.make_400m_walk_dataframe()
         #self.make_redundant_knee_xray_variable_dataframe()
         self.make_knee_pain_dataframe()
-        self.make_other_koos_subscores_dataframe()
+        #self.make_other_koos_subscores_dataframe()
         self.make_per_person_controls_dataframe()
         #self.make_previous_injury_dataframe()
         #self.make_previous_surgery_dataframe()
@@ -1130,13 +1130,14 @@ class NonImageData():
         # Income, education, marital status. Each row is one person. 
         all_clinical00_d = copy.deepcopy(self.original_dataframes['allclinical00'][['id', 'v00edcv', 'v00maritst']])
         for c in ['v00edcv']:
-            val_counts = Counter(all_clinical00_d[c])
+            val
+            _counts = Counter(all_clinical00_d[c])
             for val in sorted(val_counts.keys()):
                 print('%-50s %2.1f%%' % (val, 100.*val_counts[val] / len(all_clinical00_d)))
             missing_data_idxs = all_clinical00_d[c] == missing_data_val
             if c == 'v00edcv':
                 col_name = 'binarized_education_graduated_college'
-                all_clinical00_d[col_name] = (all_clinical00_d[c] >= '3: College graduate') * 1.
+                all_clinical00_d[col_name] = (all_clinical00_d[c] >= '1: High school graduate”') * 1.
             elif c == 'v00income':
                 col_name = 'binarized_income_at_least_50k'
                 all_clinical00_d[col_name] = (all_clinical00_d[c] >= '4: $50K to < $100K') * 1.
