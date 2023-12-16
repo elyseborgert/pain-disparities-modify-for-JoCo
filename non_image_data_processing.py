@@ -1128,32 +1128,32 @@ class NonImageData():
         missing_data_val = self.missing_data_val
 
         # Income, education, marital status. Each row is one person. 
-        all_clinical00_d = copy.deepcopy(self.original_dataframes['allclinical00'][['id', 'v00edcv', 'v00maritst']])
-        for c in ['v00edcv']:
+        all_clinical01_d = copy.deepcopy(self.original_dataframes['allclinical00'][['id', 'v00edcv', 'v00maritst']])
+        for c in ['v01edcv']:
             val
-            _counts = Counter(all_clinical00_d[c])
+            _counts = Counter(all_clinical01_d[c])
             for val in sorted(val_counts.keys()):
-                print('%-50s %2.1f%%' % (val, 100.*val_counts[val] / len(all_clinical00_d)))
-            missing_data_idxs = all_clinical00_d[c] == missing_data_val
-            if c == 'v00edcv':
+                print('%-50s %2.1f%%' % (val, 100.*val_counts[val] / len(all_clinical01_d)))
+            missing_data_idxs = all_clinical01_d[c] == missing_data_val
+            if c == 'v01edcv':
                 col_name = 'binarized_education_graduated_college'
-                all_clinical00_d[col_name] = (all_clinical00_d[c] >= '1: High school graduate”') * 1.
-            elif c == 'v00income':
+                all_clinical00_d[col_name] = (all_clinical01_d[c] >= '1: High school graduate”') * 1.
+            elif c == 'v01income':
                 col_name = 'binarized_income_at_least_50k'
-                all_clinical00_d[col_name] = (all_clinical00_d[c] >= '4: $50K to < $100K') * 1.
-            all_clinical00_d.loc[missing_data_idxs, col_name] = None
-            all_clinical00_d.loc[missing_data_idxs, c] = None
+                all_clinical01_d[col_name] = (all_clinical01_d[c] >= '4: $50K to < $100K') * 1.
+            all_clinical01_d.loc[missing_data_idxs, col_name] = None
+            all_clinical01_d.loc[missing_data_idxs, c] = None
             print("Binarizing into column %s with mean %2.3f and %2.3f missing data" % (col_name, 
-                all_clinical00_d[col_name].mean(), 
-                pd.isnull(all_clinical00_d[col_name]).mean()))
+                all_clinical01_d[col_name].mean(), 
+                pd.isnull(all_clinical01_d[col_name]).mean()))
 
-        all_clinical00_d.loc[all_clinical00_d['v00maritst'] == missing_data_val, 'v00maritst'] = None
+        all_clinical01_d.loc[all_clinical01_d['v01maritst'] == missing_data_val, 'v01maritst'] = None
 
 
         # Gender + race + site. 
         enrollees_path = os.path.join(BASE_NON_IMAGE_DATA_DIR, 'General_ASCII')
         self.load_all_text_files_in_directory(enrollees_path, datasets_to_skip=[])
-        race_sex_site = copy.deepcopy(self.original_dataframes['enrollees'][['id', 'p02hisp', 'p02race', 'p02sex', 'v00site']])
+        race_sex_site = copy.deepcopy(self.original_dataframes['enrollees'][['id', 'p02hisp', 'p02race', 'p02sex', 'v01site']])
 
 
         for c in race_sex_site.columns:
@@ -1169,12 +1169,12 @@ class NonImageData():
              race_sex_site['race_black'].mean()))
 
         assert len(race_sex_site) == TOTAL_PEOPLE
-        assert len(all_clinical00_d) == TOTAL_PEOPLE
+        assert len(all_clinical01_d) == TOTAL_PEOPLE
         assert len(set(race_sex_site['id'])) == len(race_sex_site)
-        assert len(set(all_clinical00_d['id'])) == len(all_clinical00_d)
-        assert sorted(list(race_sex_site['id'])) == sorted(list(all_clinical00_d['id']))
+        assert len(set(all_clinical01_d['id'])) == len(all_clinical01_d)
+        assert sorted(list(race_sex_site['id'])) == sorted(list(all_clinical01_d['id']))
 
-        d = pd.merge(race_sex_site, all_clinical00_d, on='id', how='inner')
+        d = pd.merge(race_sex_site, all_clinical01_d, on='id', how='inner')
         assert len(d) == TOTAL_PEOPLE
         assert len(set(d['id'])) == len(d)
 
