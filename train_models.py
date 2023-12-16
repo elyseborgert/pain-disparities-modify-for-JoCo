@@ -852,7 +852,7 @@ def train_one_model(experiment_to_run):
     elif experiment_to_run == 'train_best_model_binary':
         dataset_kwargs, model_kwargs = generate_config_that_performs_well('womac_pain_subscore')
     elif experiment_to_run == 'train_best_model_continuous':
-        dataset_kwargs, model_kwargs = generate_config_that_performs_well('koos_pain_subscore')
+        dataset_kwargs, model_kwargs = generate_config_that_performs_well('womac_pain_subscore')
     elif experiment_to_run == 'increase_diversity':
         dataset_kwargs, model_kwargs = generate_config_that_performs_well('koos_pain_subscore')
         ses_col = random.choice(['binarized_income_at_least_50k', 'binarized_education_graduated_college'])
