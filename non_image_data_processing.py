@@ -1130,14 +1130,13 @@ class NonImageData():
         # Income, education, marital status. Each row is one person. 
         all_clinical01_d = copy.deepcopy(self.original_dataframes['allclinical00'][['id', 'v00edcv', 'v00maritst']])
         for c in ['v01edcv']:
-            val
-            _counts = Counter(all_clinical01_d[c])
+            val_counts = Counter(all_clinical01_d[c])
             for val in sorted(val_counts.keys()):
                 print('%-50s %2.1f%%' % (val, 100.*val_counts[val] / len(all_clinical01_d)))
             missing_data_idxs = all_clinical01_d[c] == missing_data_val
             if c == 'v01edcv':
                 col_name = 'binarized_education_graduated_college'
-                all_clinical00_d[col_name] = (all_clinical01_d[c] >= '1: High school graduate”') * 1.
+                all_clinical01_d[col_name] = (all_clinical01_d[c] >= '1: High school graduate”') * 1.
             elif c == 'v01income':
                 col_name = 'binarized_income_at_least_50k'
                 all_clinical01_d[col_name] = (all_clinical01_d[c] >= '4: $50K to < $100K') * 1.
