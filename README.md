@@ -1,5 +1,6 @@
+# About this repository
 
-Code to generate results in "An algorithmic approach to reducing unexplained pain disparities in underserved populations". Please contact emmap1@cs.stanford.edu with any questions. 
+Code to generate results in "An algorithmic approach to reducing unexplained pain disparities in underserved populations". 
 
 ## Citation
 
@@ -10,6 +11,12 @@ Emma Pierson, David M. Cutler, Jure Leskovec, Sendhil Mullainathan, and Ziad Obe
 If you use the OAI data, please cite: 
 
 Michael C. Nevitt, David T. Felson, and Gayle Lester. The Osteoarthritis Initiative. 2006.
+
+## Clone a branch
+
+It is always best to clone via the command line instead of using VsCode built in 'tools' because Windows users should always clone using the `--config core.autocrlf=false` option, especially if working with someone elses code. The following command will clone the `joco-testing-2024.01.03` branch and save it to a `pd-joco-testing-2024.01.03` folder on your computer.
+
+`git clone --branch joco-testing-2024.01.03 --config core.autocrlf=false https://github.com/kuhlaid/pain-disparities.git pd-joco-testing-2024.01.03`
 
 ## Regenerating results
 

@@ -855,9 +855,9 @@ def train_one_model(experiment_to_run):
         model_kwargs['y_col'] = 'koos_pain_subscore_residual'
         dataset_kwargs['y_col'] = 'koos_pain_subscore_residual'
     elif experiment_to_run == 'train_best_model_binary':
-        dataset_kwargs, model_kwargs = generate_config_that_performs_well('binarized_koos_pain_subscore')
+        dataset_kwargs, model_kwargs = generate_config_that_performs_well('womac_pain_subscore')
     elif experiment_to_run == 'train_best_model_continuous':
-        dataset_kwargs, model_kwargs = generate_config_that_performs_well('koos_pain_subscore')
+        dataset_kwargs, model_kwargs = generate_config_that_performs_well('womac_pain_subscore')
     elif experiment_to_run == 'increase_diversity':
         dataset_kwargs, model_kwargs = generate_config_that_performs_well('koos_pain_subscore')
         ses_col = random.choice(['binarized_income_at_least_50k', 'binarized_education_graduated_college'])
@@ -1090,7 +1090,7 @@ def generate_random_config():
 
 def generate_config_that_performs_well(variable_to_predict):
     
-    if variable_to_predict == 'koos_pain_subscore':
+    if variable_to_predict == 'womac_pain_subscore':
         dataset_kwargs = {
             "additional_features_to_predict": CLINICAL_CONTROL_COLUMNS,
             "batch_size": 8,
@@ -1105,7 +1105,7 @@ def generate_config_that_performs_well(variable_to_predict):
             "weighted_ses_sampler_kwargs": None,
             "increase_diversity_kwargs":None,
             "hold_out_one_imaging_site_kwargs":None,
-            "y_col": "koos_pain_subscore",
+            "y_col": "womac_pain_subscore",
             "blur_filter":None
         }
 
@@ -1135,7 +1135,7 @@ def generate_config_that_performs_well(variable_to_predict):
                 "lr_scheduler_type": "plateau"
             },
             "where_to_add_klg": None,
-            "y_col": "koos_pain_subscore"
+            "y_col": "womac_pain_subscore"
         }
     elif variable_to_predict == 'binarized_koos_pain_subscore':
         raise Exception("This is deprecated and binary config should be updated.")
