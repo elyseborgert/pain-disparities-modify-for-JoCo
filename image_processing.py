@@ -84,7 +84,7 @@ class XRayImageDataset:
 
         The pipeline, then, is: 
         (before saving)
-        1. Load all diacom images and downsample each image. 
+        1. Load all dicom images and downsample each image. 
         2. Scale each image to 0-1 and compute statistics of dataset. 
         3. Save all the images. 
         (after reloading saved images)
@@ -120,7 +120,7 @@ class XRayImageDataset:
             # put images on 0-1 scale. Do this separately for the cropped knee images and the full images. 
             # Note: it is important to do this for cropped knees separately because they are not on the same scale. 
             # The external package that we uses loads them as 8-bit rather than 16-bit or something. 
-            self.diacom_image_statistics = {}
+            self.dicom_image_statistics = {}
             self.compute_dataset_image_statistics_and_divide_by_max(just_normalize_cropped_knees=False)
             # self.compute_dataset_image_statistics_and_divide_by_max(just_normalize_cropped_knees=True)
 
@@ -128,7 +128,7 @@ class XRayImageDataset:
                 # don't save extra images
                 self.images[i]['unnormalized_image_array'] = None
             print("Number of images: %i" % len(self.images))
-            pickle.dump({'images':self.images, 'image_statistics':self.diacom_image_statistics}, open(self.processed_image_path, 'wb'))
+            pickle.dump({'images':self.images, 'image_statistics':self.dicom_image_statistics}, open(self.processed_image_path, 'wb'))
             print("Successfully processed and saved images")
         else:
             print("loading images from %s" % self.processed_image_path)
@@ -169,7 +169,7 @@ class XRayImageDataset:
                         new_shape = new_shape[::-1] 
                         self.images[i]['%s_knee_scaled_to_zero_one' % side] = cv2.resize(self.images[i]['%s_knee_scaled_to_zero_one' % side],
                          dsize=tuple(new_shape))
-            self.diacom_image_statistics = reloaded_data['image_statistics']
+            self.dicom_image_statistics = reloaded_data['image_statistics']
             print("Image statistics are", reloaded_data['image_statistics'])
             self.make_images_RGB_and_zscore() # z-score. The reason we do this AFTER processing is that we don't want to save the image 3x. 
             #self.plot_pipeline_examples(25) # make sanity check plots
@@ -213,18 +213,18 @@ class XRayImageDataset:
         with open(os.path.join(BASE_IMAGE_DATA_DIR, IMG_METADATA_FILE)) as imagesList:
             next(imagesList)    # this skips the header
             for imgMetaData in imagesList:
-                imgMetaDataArray = imgMetaData.split(IMG_METADATA_FILE_SEPARATOR)   # we split each row of image metadata
+                imgMetaDataArray = imgMetaData.split(IMG_METADATA_FILE_SEPARATOR)   # we split each column of image metadata
                 # the file path found in the second column of the metadata file, the metadata file should be formatted like (Patient ID|RelativeImagePath|Timepoint|Barcode)
-                image_path=os.path.join(BASE_IMAGE_DATA_DIR, imgMetaDataArray[1])
+                image_path=os.path.join(BASE_IMAGE_DATA_DIR, imgMetaDataArray[IMG_METADATA_P_PATH])
                 print("image_path="+image_path)
-                diacom_image = self.load_diacom_file(image_path)
-                if diacom_image is not None:
-                    image_array = self.get_resized_pixel_array_from_dicom_image(diacom_image)
-                    self.images.append({'timepoint':imgMetaDataArray[2], 
+                dicom_image = self.load_dicom_file(image_path)
+                if dicom_image is not None:
+                    image_array = self.get_resized_pixel_array_from_dicom_image(dicom_image)
+                    self.images.append({'timepoint':imgMetaDataArray[IMG_METADATA_P_TIMEPOINT], 
                         'full_path':image_path,
-                        'subject':imgMetaDataArray[0],
+                        'subject':imgMetaDataArray[IMG_METADATA_P_SUBJECT],
                         'unnormalized_image_array':image_array, 
-                        'barcode':imgMetaDataArray[3]
+                        'barcode':imgMetaDataArray[IMG_METADATA_P_BARCODE]
                         })
 
     def plot_pipeline_examples(self, n_examples):
@@ -237,9 +237,9 @@ class XRayImageDataset:
             idx = random.choice(range(len(self.images)))
             plt.figure(figsize=[15, 5])
 
-            original_diacom_image = self.load_diacom_file(self.images[idx]['full_path'])
+            original_dicom_image = self.load_dicom_file(self.images[idx]['full_path'])
             plt.subplot(131)
-            plt.imshow(original_diacom_image.pixel_array, cmap='bone')
+            plt.imshow(original_dicom_image.pixel_array, cmap='bone')
             plt.colorbar()
             
             zscore_range = 2
@@ -306,7 +306,7 @@ class XRayImageDataset:
         new_array = cv2.resize(original_array, dsize=tuple(new_size), interpolation=cv2.INTER_CUBIC)
         return new_array
 
-    def load_diacom_file(self, filename):
+    def load_dicom_file(self, filename):
         """
         load a matplotlib array from the pydicom file filename. Checked. 
         Drawn heavily from this documentation example: 
@@ -327,13 +327,13 @@ class XRayImageDataset:
 
         return dataset
 
-    def get_resized_pixel_array_from_dicom_image(self, diacom_image):
+    def get_resized_pixel_array_from_dicom_image(self, dicom_image):
         """
         Extract pydicom pixel array and resize. Checked. 
         Per documentation, "The pixel_array property returns a NumPy array"
         """
         print("get_resized_pixel_array_from_dicom_image")
-        arr = self.resize_image(diacom_image.pixel_array, RESAMPLED_IMAGE_SIZE) * 1.0
+        arr = self.resize_image(dicom_image.pixel_array, RESAMPLED_IMAGE_SIZE) * 1.0
         assert len(arr.shape) == 2
         return arr
 
@@ -378,7 +378,7 @@ class XRayImageDataset:
         # else:
         suffix = 'full_image'
 
-        self.diacom_image_statistics['max_%s' % suffix] = 1.0*arr_max
+        self.dicom_image_statistics['max_%s' % suffix] = 1.0*arr_max
 
         for i in range(len(self.images)):
             # if just_normalize_cropped_knees:
@@ -387,10 +387,10 @@ class XRayImageDataset:
             #         self.images[i]['cropped_left_knee'] = self.images[i]['cropped_left_knee'] / arr_max
             # else:
             self.images[i]['image_array_scaled_to_zero_one'] = self.images[i]['unnormalized_image_array'] / arr_max
-        self.diacom_image_statistics['mean_of_zero_one_data_%s' % suffix] = np.mean(all_pixel_arrays) / arr_max
-        self.diacom_image_statistics['std_of_zero_one_data_%s' % suffix] = np.std(all_pixel_arrays) / arr_max
-        for k in self.diacom_image_statistics.keys():
-            print(k, self.diacom_image_statistics[k])
+        self.dicom_image_statistics['mean_of_zero_one_data_%s' % suffix] = np.mean(all_pixel_arrays) / arr_max
+        self.dicom_image_statistics['std_of_zero_one_data_%s' % suffix] = np.std(all_pixel_arrays) / arr_max
+        for k in self.dicom_image_statistics.keys():
+            print(k, self.dicom_image_statistics[k])
     
     def make_images_RGB_and_zscore(self):
         """
@@ -435,11 +435,11 @@ class XRayImageDataset:
                     std_to_use = [0.229, 0.224, 0.225]
                 elif self.normalization_method == 'our_statistics':
                     if self.crop_to_just_the_knee:
-                        mean_to_use = [self.diacom_image_statistics['mean_of_zero_one_data_cropped_knee_only']] * 3
-                        std_to_use = [self.diacom_image_statistics['std_of_zero_one_data_cropped_knee_only']] * 3
+                        mean_to_use = [self.dicom_image_statistics['mean_of_zero_one_data_cropped_knee_only']] * 3
+                        std_to_use = [self.dicom_image_statistics['std_of_zero_one_data_cropped_knee_only']] * 3
                     else:
-                        mean_to_use = [self.diacom_image_statistics['mean_of_zero_one_data_full_image']] * 3
-                        std_to_use = [self.diacom_image_statistics['std_of_zero_one_data_full_image']] * 3
+                        mean_to_use = [self.dicom_image_statistics['mean_of_zero_one_data_full_image']] * 3
+                        std_to_use = [self.dicom_image_statistics['std_of_zero_one_data_full_image']] * 3
                 elif self.normalization_method == 'zscore_individually':
                     mean_to_use = [original_image.mean()] * 3
                     std_to_use = [original_image.std()] * 3

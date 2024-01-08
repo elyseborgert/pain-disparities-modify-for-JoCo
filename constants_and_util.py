@@ -27,12 +27,6 @@ warnings.filterwarnings("ignore", message="numpy.dtype size changed")
 warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
 warnings.filterwarnings("ignore", message="This call to matplotlib.use() has no effect because the backend has already been chosen")
 
-
-USE_HELD_OUT_TEST_SET = True
-MODEL_NAME = 'resnet18'
-TOTAL_PEOPLE = 4796
-N_BOOTSTRAPS = 1000
-
 if getpass.getuser() == 'emmap1':
     """
     # commented out as it does not appy to most users
@@ -77,7 +71,13 @@ else:
     INDIVIDUAL_IMAGES_PATH = os.path.join(os.getenv('PROCESSED_DATA_DIR'),'individualImages') # points to the directory which stores the processed data, so you should download the processed data into this folder. If you are reprocessing the raw data, the individual images will be stored in this folder. 
     IMG_METADATA_FILE = os.getenv('IMG_METADATA_FILE')  # this file contains all of the reference data to our images
     IMG_METADATA_FILE_SEPARATOR = os.getenv('IMG_METADATA_FILE_SEPARATOR')  # the field separator for IMG_METADATA_FILE
-    
+    IMG_METADATA_P_SUBJECT = os.getenv('IMG_METADATA_P_SUBJECT') # column within the metadata file where the subject ID is specified
+    IMG_METADATA_P_PATH = os.getenv('IMG_METADATA_P_PATH') # column within the metadata file where the image path is specified
+    IMG_METADATA_P_TIMEPOINT = os.getenv('IMG_METADATA_P_TIMEPOINT')  # column within the metadata file where the timepoint is specified
+    IMG_METADATA_P_BARCODE = os.getenv('IMG_METADATA_P_BARCODE')  # column within the metadata file where the image ID is specified
+
+    TOTAL_PEOPLE = os.getenv('TOTAL_PEOPLE')
+
     while not os.path.exists(INDIVIDUAL_IMAGES_PATH):
         os.system('mkdir -p ' + INDIVIDUAL_IMAGES_PATH)    # the -p flag will create any directories not yet created in the path (leaving out -p will produce an error if subfolders are not yet created)
         time.sleep(3)
@@ -537,9 +537,11 @@ def match_image_dataset_to_non_image_dataset(image_dataset, non_image_dataset, s
     assert clinical_assessments['barcdbu'].map(lambda x:len(x) == 12).all()
     print(clinical_assessments.head())
     print("Prior to filtering for images that pass QC, %i images" % len(clinical_assessments))
-    acceptable_barcodes = find_image_barcodes_that_pass_qc(non_image_dataset)
-    clinical_assessments = clinical_assessments.loc[clinical_assessments['barcdbu'].map(lambda x:x in acceptable_barcodes)]
-    print("After filtering for images that pass QC, %i images" % len(clinical_assessments)) # this doesn't filter out a lot of clinical assessments, even though a lot of values in the xray01 etc datasets are NA, because those values are already filtered out of the kxr_sq_bu -- you can't assign image scores to an image which isn't available. 
+
+    # wpg - we are going to assume all of our images pass QC (even though we have no QC measures in place)
+    # acceptable_barcodes = find_image_barcodes_that_pass_qc(non_image_dataset)
+    # clinical_assessments = clinical_assessments.loc[clinical_assessments['barcdbu'].map(lambda x:x in acceptable_barcodes)]
+    # print("After filtering for images that pass QC, %i images" % len(clinical_assessments)) # this doesn't filter out a lot of clinical assessments, even though a lot of values in the xray01 etc datasets are NA, because those values are already filtered out of the kxr_sq_bu -- you can't assign image scores to an image which isn't available. 
     
     combined_df = get_combined_dataframe(non_image_dataset, clinical_assessments)
     # if clinical_assessments:    # debugging
