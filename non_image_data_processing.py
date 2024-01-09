@@ -1089,8 +1089,8 @@ class NonImageData():
         print("Womac scores not missing data: %i" % len(all_knee_pain_scores['womac_pain_subscore'].dropna()))
         for timepoint in sorted(list(set(all_knee_pain_scores['visit']))):
             df_for_timepoint = copy.deepcopy(all_knee_pain_scores.loc[all_knee_pain_scores['visit'] == timepoint])
-            print("Timepoint %s, fraction womac scores complete: %2.3f % (timepoint, 
-                1 - pd.isnull(df_for_timepoint['womac_pain_subscore']).mean())
+            print("Timepoint %s, fraction womac scores complete: %2.3f" % (timepoint, 
+                1 - pd.isnull(df_for_timepoint['womac_pain_subscore']).mean()))
 
         all_knee_pain_scores = all_knee_pain_scores.dropna()
         print("Number of knee pain scores not missing data: %i" % len(all_knee_pain_scores))
