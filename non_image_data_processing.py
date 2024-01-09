@@ -1086,7 +1086,7 @@ class NonImageData():
         for k in ['womac_pain_subscore']:
             all_knee_pain_scores[k] = all_knee_pain_scores[k].map(lambda x:float(x) if len(str(x).strip()) > 0 else None)
         print("Number of knee pain scores: %i" % len(all_knee_pain_scores))
-        print("Womac scores not missing data: %i % len(all_knee_pain_scores['womac_pain_subscore'].dropna())))
+        print("Womac scores not missing data: %i" % len(all_knee_pain_scores['womac_pain_subscore'].dropna())))
         for timepoint in sorted(list(set(all_knee_pain_scores['visit']))):
             df_for_timepoint = copy.deepcopy(all_knee_pain_scores.loc[all_knee_pain_scores['visit'] == timepoint])
             print("Timepoint %s, fraction womac scores complete: %2.3f % (timepoint, 
