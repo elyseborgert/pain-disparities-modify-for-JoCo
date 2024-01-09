@@ -71,12 +71,12 @@ else:
     INDIVIDUAL_IMAGES_PATH = os.path.join(os.getenv('PROCESSED_DATA_DIR'),'individualImages') # points to the directory which stores the processed data, so you should download the processed data into this folder. If you are reprocessing the raw data, the individual images will be stored in this folder. 
     IMG_METADATA_FILE = os.getenv('IMG_METADATA_FILE')  # this file contains all of the reference data to our images
     IMG_METADATA_FILE_SEPARATOR = os.getenv('IMG_METADATA_FILE_SEPARATOR')  # the field separator for IMG_METADATA_FILE
-    IMG_METADATA_P_SUBJECT = os.getenv('IMG_METADATA_P_SUBJECT') # column within the metadata file where the subject ID is specified
-    IMG_METADATA_P_PATH = os.getenv('IMG_METADATA_P_PATH') # column within the metadata file where the image path is specified
-    IMG_METADATA_P_TIMEPOINT = os.getenv('IMG_METADATA_P_TIMEPOINT')  # column within the metadata file where the timepoint is specified
-    IMG_METADATA_P_BARCODE = os.getenv('IMG_METADATA_P_BARCODE')  # column within the metadata file where the image ID is specified
+    IMG_METADATA_P_SUBJECT = int(os.getenv('IMG_METADATA_P_SUBJECT')) # column within the metadata file where the subject ID is specified
+    IMG_METADATA_P_PATH = int(os.getenv('IMG_METADATA_P_PATH')) # column within the metadata file where the image path is specified
+    IMG_METADATA_P_TIMEPOINT = int(os.getenv('IMG_METADATA_P_TIMEPOINT'))  # column within the metadata file where the timepoint is specified
+    IMG_METADATA_P_BARCODE = int(os.getenv('IMG_METADATA_P_BARCODE'))  # column within the metadata file where the image ID is specified
 
-    TOTAL_PEOPLE = os.getenv('TOTAL_PEOPLE')
+    TOTAL_PEOPLE = int(os.getenv('TOTAL_PEOPLE'))
 
     while not os.path.exists(INDIVIDUAL_IMAGES_PATH):
         os.system('mkdir -p ' + INDIVIDUAL_IMAGES_PATH)    # the -p flag will create any directories not yet created in the path (leaving out -p will produce an error if subfolders are not yet created)
@@ -187,8 +187,8 @@ assert TRAIN_VAL_TEST_HOLD_OUT_FRACTIONS['hold_out_frac'] <= 1500./TOTAL_PEOPLE 
 
 # these are directories that should exist in the image processing directory
 IMAGE_TIMEPOINT_DIRS_TO_FOLLOWUP = json.loads(os.getenv('IMAGE_TIMEPOINT_DIRS_TO_FOLLOWUP'))
-KOOS_BINARIZATION_THRESH = os.getenv('KOOS_BINARIZATION_THRESH')
-WOMAC_BINARIZATION_THRESH = os.getenv('WOMAC_BINARIZATION_THRESH')
+KOOS_BINARIZATION_THRESH = float(os.getenv('KOOS_BINARIZATION_THRESH'))
+WOMAC_BINARIZATION_THRESH = float(os.getenv('WOMAC_BINARIZATION_THRESH'))
 
 AGE_RACE_SEX_SITE = ['C(age_at_visit)*C(p02sex)', 'C(p02hisp)', "C(p02race, Treatment(reference='1: White or Caucasian'))", 'C(v00site)']
 AGE_SEX_SITE_NO_RACE = ['C(age_at_visit)*C(p02sex)', 'C(v00site)']
