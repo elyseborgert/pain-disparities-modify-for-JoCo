@@ -1307,7 +1307,7 @@ class NonImageData():
         # drop a very small number of rows with weird barcodes. 
         print("prior to dropping semiquantitative data missing a barcode, %i rows" % len(combined_data))
         combined_data = combined_data.dropna(subset=['barcdbu'])
-        combined_data = combined_data.loc[combined_data['barcdbu'] != 'T']
+        # combined_data = combined_data.loc[combined_data['barcdbu'] != 'T']   # this seems to cause problems with JoCo data since a barcode value of 'T' is not an option
         combined_data['barcdbu'] = combined_data['barcdbu'].map(lambda x:'0'+str(int(x)))
         assert (combined_data['barcdbu'].map(len) == 12).all()
         assert (combined_data['barcdbu'].map(lambda x:x[:4] == '0166')).all()
