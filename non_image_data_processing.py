@@ -1309,8 +1309,8 @@ class NonImageData():
         combined_data = combined_data.dropna(subset=['barcdbu'])
         # combined_data = combined_data.loc[combined_data['barcdbu'] != 'T']   # this seems to cause problems with JoCo data since a barcode value of 'T' is not an option
         combined_data['barcdbu'] = combined_data['barcdbu'].map(lambda x:'0'+str(int(x)))
-        assert (combined_data['barcdbu'].map(len) == 12).all()
-        assert (combined_data['barcdbu'].map(lambda x:x[:4] == '0166')).all()
+        # assert (combined_data['barcdbu'].map(len) == 12).all()     # do not need for Joco
+        # assert (combined_data['barcdbu'].map(lambda x:x[:4] == '0166')).all()  # do not need for Joco
         print("After dropping, %i rows" % len(combined_data))
         
         # From the notes: "the variables uniquely identifying a record in these datasets are ID, SIDE, and READPRJ"
