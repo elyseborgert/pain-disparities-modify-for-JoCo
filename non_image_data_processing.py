@@ -1394,6 +1394,9 @@ class NonImageData():
             filtered_for_project.append(df_for_timepoint)
         combined_data = pd.concat(filtered_for_project)
         combined_data.index = range(len(combined_data))
+        # testing
+        print("Assert subset visit len=%s should equal combined_data len=%s" % (len(combined_data.drop_duplicates(subset=['id', 'side', 'visit'])), len(combined_data)))
+        print("Assert subset barcdbu len=%s should equal combined_data len=%s" % (len(combined_data.drop_duplicates(subset=['barcdbu', 'side'])), len(combined_data)))
         assert len(combined_data.drop_duplicates(subset=['id', 'side', 'visit'])) == len(combined_data)
         assert len(combined_data.drop_duplicates(subset=['barcdbu', 'side'])) == len(combined_data)
 
