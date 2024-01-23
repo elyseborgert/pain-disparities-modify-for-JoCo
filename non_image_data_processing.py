@@ -1313,6 +1313,9 @@ class NonImageData():
         # assert (combined_data['barcdbu'].map(lambda x:x[:4] == '0166')).all()  # do not need for Joco
         print("After dropping, %i rows" % len(combined_data))
         
+        # testing
+        print("Assert combined_data.drop_duplicates readprj len=%s should equal combined_data len=%s" % (len(combined_data.drop_duplicates(subset=['id', 'side', 'visit', 'readprj'])), len(combined_data)))
+        print(combined_data)
         # From the notes: "the variables uniquely identifying a record in these datasets are ID, SIDE, and READPRJ"
         assert len(combined_data.drop_duplicates(subset=['id', 'side', 'visit', 'readprj'])) == len(combined_data)
 
