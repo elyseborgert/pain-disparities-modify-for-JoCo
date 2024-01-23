@@ -1322,22 +1322,17 @@ class NonImageData():
         filtered_for_project = []
 
         def timepoint_a_less_than_or_equal_to_b(a, b):
-            valid_timepoints = ['00 month follow-up: Baseline', 
-            '12 month follow-up', 
-            '24 month follow-up', 
-            '36 month follow-up', 
-            '48 month follow-up', 
-            '72 month follow-up',
-            '96 month follow-up']
+            valid_timepoints = ['Baseline', 
+            'First follow-up']
             assert (a in valid_timepoints) and (b in valid_timepoints)
             a_idx = valid_timepoints.index(a)
             b_idx = valid_timepoints.index(b)
             return a_idx <= b_idx
 
         for timepoint in sorted(list(set(combined_data['visit']))):
-            if timepoint == '72 month follow-up':
-                print("Skipping %s because not sure how to fill in missing data; there is lots of missing data even for people with KLG >= 2" % timepoint)
-                continue
+            # if timepoint == '72 month follow-up':
+            #     print("Skipping %s because not sure how to fill in missing data; there is lots of missing data even for people with KLG >= 2" % timepoint)
+            #     continue
             timepoint_idxs = combined_data['visit'] == timepoint
             df_for_timepoint = combined_data.loc[timepoint_idxs]
             readings_for_15 = set(df_for_timepoint.loc[df_for_timepoint['readprj'] == 15, 'id'])
@@ -1352,14 +1347,11 @@ class NonImageData():
                 len(readings_for_15 - readings_for_37), 
                 len(readings_for_37 - readings_for_15), 
                 len(readings_for_37.intersection(readings_for_15))))
-            if timepoint in ['00 month follow-up: Baseline', 
-            '12 month follow-up', 
-            '24 month follow-up', 
-            '36 month follow-up', 
-            '48 month follow-up']:
-                df_for_timepoint = df_for_timepoint.loc[df_for_timepoint['readprj'] == 15]
-            elif timepoint in ['72 month follow-up', '96 month follow-up']:
+            if timepoint in ['Baseline', 
+            'First follow-up']:
                 df_for_timepoint = df_for_timepoint.loc[df_for_timepoint['readprj'] == 37]
+            # elif timepoint in ['72 month follow-up', '96 month follow-up']:
+            #     df_for_timepoint = df_for_timepoint.loc[df_for_timepoint['readprj'] == 37]
             else:
                 raise Exception("invalid timepoint")
 

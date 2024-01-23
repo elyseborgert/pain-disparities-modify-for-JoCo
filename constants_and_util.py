@@ -219,7 +219,7 @@ MRI = ['C(bml2plusl)', 'C(bml2plusm)', 'C(bml2pluspf)',
                'C(car11plusl)', 'C(car11plusm)', 'C(car11pluspf)', 
                'C(menextl)', 'C(menextm)', 'C(mentearl)', 'C(mentearm)']
 FRACTURES_AND_FALLS = ['fractured_spine', 'fractured_hip', 'fractured_bone', 'fell_in_last_12_months']
-TIMEPOINT_AND_SIDE = ["C(visit, Treatment(reference='00 month follow-up: Baseline'))", 'side', 'C(dominant_leg)']
+TIMEPOINT_AND_SIDE = ["C(visit, Treatment(reference='Baseline'))", 'side', 'C(dominant_leg)']
 
 def validate_folder_contents(path):
     """
