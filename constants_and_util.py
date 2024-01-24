@@ -187,6 +187,7 @@ assert TRAIN_VAL_TEST_HOLD_OUT_FRACTIONS['hold_out_frac'] <= 1500./TOTAL_PEOPLE 
 
 # these are directories that should exist in the image processing directory
 IMAGE_TIMEPOINT_DIRS_TO_FOLLOWUP = json.loads(os.getenv('IMAGE_TIMEPOINT_DIRS_TO_FOLLOWUP'))
+IMAGE_SIDES = json.loads(os.getenv('IMAGE_SIDES'))
 KOOS_BINARIZATION_THRESH = float(os.getenv('KOOS_BINARIZATION_THRESH'))
 WOMAC_BINARIZATION_THRESH = float(os.getenv('WOMAC_BINARIZATION_THRESH'))
 

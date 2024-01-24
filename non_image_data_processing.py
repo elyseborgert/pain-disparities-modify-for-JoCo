@@ -48,7 +48,7 @@ class NonImageData():
         self.filter_out_special_values_in_mri_data = filter_out_special_values_in_mri_data
         # From the OAI quantitative x-ray notes: 
         # The variable SIDE denotes whether the row of data is for a right side image (SIDE=1) or a left side image (SIDE=2)
-        self.side_mappings = {1:'right', 2:'left'}
+        self.side_mappings = IMAGE_SIDES
         if timepoints_to_filter_for is None:
             self.timepoints_to_filter_for = TIMEPOINTS_TO_FILTER_FOR
             print("Set timepoints to filter for to", TIMEPOINTS_TO_FILTER_FOR)
@@ -1315,7 +1315,7 @@ class NonImageData():
         
         # testing
         print("Assert combined_data.drop_duplicates readprj len=%s should equal combined_data len=%s" % (len(combined_data.drop_duplicates(subset=['id', 'side', 'visit', 'readprj'])), len(combined_data)))
-        print(combined_data)
+        combined_data.to_csv(os.path.join(TESTING_OUTPUT_DIR, 'combined_data_test.csv'))  # test printing the data so we can analyze
         # From the notes: "the variables uniquely identifying a record in these datasets are ID, SIDE, and READPRJ"
         assert len(combined_data.drop_duplicates(subset=['id', 'side', 'visit', 'readprj'])) == len(combined_data)
 
