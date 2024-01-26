@@ -1301,7 +1301,8 @@ class NonImageData():
                 # Please note that although some participants are coded READPRJ=42, they are in fact participants in Project 37. Users should recode these participants from READPRJ=42 to READPRJ=37.
                 miscoded_project_idxs = self.original_dataframes[dataset_name]['readprj'] == 42
                 self.original_dataframes[dataset_name].loc[miscoded_project_idxs, 'readprj'] = 37
-                self.original_dataframes[dataset_name]['side'] = self.original_dataframes[dataset_name]['side'].map(lambda x:self.side_mappings[x])
+                print(self.side_mappings)
+                self.original_dataframes[dataset_name]['side'] = self.original_dataframes[dataset_name]['side'].map(lambda x:self.side_mappings[int(x)])
         combined_data = self.concatenate_dataframes_from_multiple_timepoints(dataset_substring)
         
         # drop a very small number of rows with weird barcodes. 
