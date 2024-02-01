@@ -1317,6 +1317,7 @@ class NonImageData():
         # testing
         print("Assert combined_data.drop_duplicates readprj len=%s should equal combined_data len=%s" % (len(combined_data.drop_duplicates(subset=['id', 'side', 'visit', 'readprj'])), len(combined_data)))
         combined_data.to_csv(os.path.join(TESTING_OUTPUT_DIR, 'combined_data_test.csv'))  # test printing the data so we can analyze
+        combined_data.drop_duplicates(subset=['id', 'side', 'visit', 'readprj']).to_csv(os.path.join(TESTING_OUTPUT_DIR, 'combined_data_dd_test.csv'))  # test printing the data so we can analyze
         # From the notes: "the variables uniquely identifying a record in these datasets are ID, SIDE, and READPRJ"
         assert len(combined_data.drop_duplicates(subset=['id', 'side', 'visit', 'readprj'])) == len(combined_data)
 
