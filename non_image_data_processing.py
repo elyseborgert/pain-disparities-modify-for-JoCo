@@ -1302,8 +1302,8 @@ class NonImageData():
                 miscoded_project_idxs = self.original_dataframes[dataset_name]['readprj'] == 42
                 self.original_dataframes[dataset_name].loc[miscoded_project_idxs, 'readprj'] = 37
                 print("dataset_name:",dataset_name)
-                print("dataset_name side", self.original_dataframes[dataset_name]['side'])
-                self.original_dataframes[dataset_name]['side'] = self.original_dataframes[dataset_name]['side'].map(lambda x:self.side_mappings[int(x)])
+                print("dataset_name unique sides", np.unique(self.original_dataframes[dataset_name]['side']))
+                self.original_dataframes[dataset_name]['side'] = self.original_dataframes[dataset_name]['side'].map(lambda x:self.side_mappings[str(x)])
         combined_data = self.concatenate_dataframes_from_multiple_timepoints(dataset_substring)
         
         # drop a very small number of rows with weird barcodes. 
