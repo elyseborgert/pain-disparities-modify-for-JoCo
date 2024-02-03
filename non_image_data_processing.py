@@ -1112,11 +1112,11 @@ class NonImageData():
             val_counts = Counter(all_clinical01_d[c])
             for val in sorted(val_counts.keys()):
                 print('%-50s %2.1f%%' % (val, 100.*val_counts[val] / len(all_clinical01_d)))
-            # print("missing_data_val type=",type(missing_data_val)," and all_clinical01_d[c]=",type())
-            missing_data_idxs = False   # JoCo data is not using the `missing_data_val` string
+            print("all_clinical01_d[c]=",all_clinical01_d[c])
+            missing_data_idxs = False   # JoCo data is not using the `missing_data_val` string (the original comparison fails for us, comparing a Series to a string)
             if c == 'v01edcv':
                 col_name = 'binarized_education_graduated_college'
-                all_clinical01_d[col_name] = (all_clinical01_d[c] >= '1: High school graduate”') * 1.
+                all_clinical01_d[col_name] = (all_clinical01_d[c] >= '1: High school graduate') * 1.
             elif c == 'v01income':
                 col_name = 'binarized_income_at_least_50k'
                 all_clinical01_d[col_name] = (all_clinical01_d[c] >= '4: $50K to < $100K') * 1.
