@@ -1112,6 +1112,7 @@ class NonImageData():
             val_counts = Counter(all_clinical01_d[c])
             for val in sorted(val_counts.keys()):
                 print('%-50s %2.1f%%' % (val, 100.*val_counts[val] / len(all_clinical01_d)))
+            print("missing_data_val type=",type(missing_data_val)," and all_clinical01_d[c]=",type(all_clinical01_d[c]))
             missing_data_idxs = all_clinical01_d[c] == missing_data_val
             if c == 'v01edcv':
                 col_name = 'binarized_education_graduated_college'
@@ -1316,8 +1317,8 @@ class NonImageData():
         
         # testing
         print("Assert combined_data.drop_duplicates readprj len=%s should equal combined_data len=%s" % (len(combined_data.drop_duplicates(subset=['id', 'side', 'visit', 'readprj'])), len(combined_data)))
-        combined_data.to_csv(os.path.join(TESTING_OUTPUT_DIR, 'combined_data_test.csv'))  # test printing the data so we can analyze
-        combined_data.drop_duplicates(subset=['id', 'side', 'visit', 'readprj']).to_csv(os.path.join(TESTING_OUTPUT_DIR, 'combined_data_dd_test.csv'))  # test printing the data so we can analyze
+        # combined_data.to_csv(os.path.join(TESTING_OUTPUT_DIR, 'combined_data_test.csv'))  # test printing the data so we can analyze
+        # combined_data.drop_duplicates(subset=['id', 'side', 'visit', 'readprj']).to_csv(os.path.join(TESTING_OUTPUT_DIR, 'combined_data_dd_test.csv'))  # test printing the data so we can analyze
         # From the notes: "the variables uniquely identifying a record in these datasets are ID, SIDE, and READPRJ"
         assert len(combined_data.drop_duplicates(subset=['id', 'side', 'visit', 'readprj'])) == len(combined_data)
 
