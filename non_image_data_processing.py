@@ -1109,10 +1109,11 @@ class NonImageData():
         # Income, education, marital status. Each row is one person. 
         all_clinical01_d = copy.deepcopy(self.original_dataframes['allclinical01'][['id', 'v01edcv', 'v01maritst']])
         for c in ['v01edcv']:
+            print("all_clinical01_d[c]=",all_clinical01_d[c])
             val_counts = Counter(all_clinical01_d[c])
+            print("val_counts=",val_counts)
             for val in sorted(val_counts.keys()):
                 print('%-50s %2.1f%%' % (val, 100.*val_counts[val] / len(all_clinical01_d)))
-            print("all_clinical01_d[c]=",all_clinical01_d[c])
             missing_data_idxs = False   # JoCo data is not using the `missing_data_val` string (the original comparison fails for us, comparing a Series to a string)
             if c == 'v01edcv':
                 col_name = 'binarized_education_graduated_college'
