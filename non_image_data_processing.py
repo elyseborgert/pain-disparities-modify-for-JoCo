@@ -1127,7 +1127,7 @@ class NonImageData():
                 all_clinical01_d[col_name].mean(), 
                 pd.isnull(all_clinical01_d[col_name]).mean()))
 
-        all_clinical01_d.loc[all_clinical01_d['v01maritst'] == missing_data_val, 'v01maritst'] = None
+        # all_clinical01_d.loc[all_clinical01_d['v01maritst'] == missing_data_val, 'v01maritst'] = None
 
 
         # Gender + race + site. 
