@@ -333,7 +333,7 @@ class NonImageData():
         """
         Risk factors at baseline. 
         """
-        df = copy.deepcopy(self.original_dataframes['allclinical00'])
+        df = copy.deepcopy(self.original_dataframes['allclinical01'])
         
         # cigarette smoking. 
         df['cigarette_smoker'] = df['v00smoker']
@@ -369,7 +369,7 @@ class NonImageData():
         
         # we omit ALZDZ even though it's in david's script because it doessn't appear to be in our data. 
         
-        all_ids = list(self.original_dataframes['allclinical00']['id'])
+        all_ids = list(self.original_dataframes['allclinical01']['id'])
         has_disease = {}
         nas_at_baseline = {}
         for condition in medical_conditions:
@@ -415,7 +415,7 @@ class NonImageData():
         Falls occur in the last 12 months and are thus not cumulatively defined. 
         """
         print("Making fracture and fall dataframe!")
-        all_ids = list(self.original_dataframes['allclinical00']['id'])
+        all_ids = list(self.original_dataframes['allclinical01']['id'])
         have_fracture = {}
         nas_at_baseline = {}
         all_dfs = []
@@ -551,8 +551,8 @@ class NonImageData():
         left_cols = [col % 'l' for col in cols]
         right_cols = [col % 'r' for col in cols]
         
-        left_df = self.original_dataframes['allclinical00'][['id'] + left_cols].copy()
-        right_df = self.original_dataframes['allclinical00'][['id'] + right_cols].copy()
+        left_df = self.original_dataframes['allclinical01'][['id'] + left_cols].copy()
+        right_df = self.original_dataframes['allclinical01'][['id'] + right_cols].copy()
         
         left_df.columns = ['id'] + new_col_names
         right_df.columns = ['id'] + new_col_names
@@ -577,11 +577,11 @@ class NonImageData():
     def make_dominant_leg_dataframe(self):
         """
         Checked. 
-        Don’t use timepoint info (ie, we define this using allclinical00 only) because lots of missing data at 
+        Don’t use timepoint info (ie, we define this using allclinical01 only) because lots of missing data at 
         subsequent timepoints and seems like there are causality problems.  
         """
         print("\n\n***Making dominant leg dataframe")
-        right_leg_df = copy.deepcopy(self.original_dataframes['allclinical00'][['id', 'v00kikball']])
+        right_leg_df = copy.deepcopy(self.original_dataframes['allclinical01'][['id', 'v00kikball']])
         right_leg_df.columns = ['id', 'dominant_leg']
         missing_data_idxs = (right_leg_df['dominant_leg'] == self.missing_data_val).values
         left_leg_df = copy.deepcopy(right_leg_df)
@@ -614,7 +614,7 @@ class NonImageData():
         max_weight_col = 'v00wtmaxkg'
         current_height_col = 'p01height'
         desired_cols = ['id'] + [current_weight_col, max_weight_col, current_height_col]
-        bmi_df = copy.deepcopy(self.original_dataframes['allclinical00'][desired_cols])
+        bmi_df = copy.deepcopy(self.original_dataframes['allclinical01'][desired_cols])
         
         bmi_df['current_bmi'] = bmi_df[current_weight_col] / ((bmi_df[current_height_col] / 1000.) ** 2)
         bmi_df['max_bmi'] = bmi_df[max_weight_col] / ((bmi_df[current_height_col] / 1000.) ** 2)
@@ -826,7 +826,7 @@ class NonImageData():
                        "V00YOGACV", "V00HERBCV", "V00RELACV", "V00SPIRCV", 
                        "V00OTHCAMC", "V00OTHCAM"]
         cols = ['id'] + [a.lower() for a in interventions]
-        df = self.original_dataframes['allclinical00'][cols].copy()
+        df = self.original_dataframes['allclinical01'][cols].copy()
         
         for c in df.columns:
             if c != 'id':
@@ -909,7 +909,7 @@ class NonImageData():
     def make_previous_injury_or_surgery_dataframe(self, baseline_substring, followup_substring, col_name, set_missing_baseline_to_0=False, waves_to_skip=None):
         """
         While the code in this method refers to "injury", we actually use it to define both injuries + surgeries. 
-        baseline_substring identifies the column used in allclinical00
+        baseline_substring identifies the column used in allclinical01
         followup_substring identifies the column in subsequent clinical dataframes
         col_name is the name we want to give the column. 
 
@@ -1127,7 +1127,7 @@ class NonImageData():
                 all_clinical01_d[col_name].mean(), 
                 pd.isnull(all_clinical01_d[col_name]).mean()))
 
-        # all_clinical01_d.loc[all_clinical01_d['v01maritst'] == missing_data_val, 'v01maritst'] = None
+        all_clinical01_d.loc[all_clinical01_d['v01maritst'] == missing_data_val, 'v01maritst'] = None
 
 
         # Gender + race + site. 
@@ -1348,7 +1348,7 @@ class NonImageData():
             # Many people do have readings for both projects. But I think it is cleaner to be consistent in the project used for timepoints 0 - 48m. 
             # Project 37 is done only on  a weird sample of people, so attempting to merge somehow would lead to an inconsistent definition of image variables
             # on a non-random subset of the population. However, note that this means that our definitions of some image variables don't quite line up 
-            # with the definitions of image variables in allclinical00: eg, their knee lateral joint space narrowing appears to be some kind of max of the two projects. This is fine, because we don't use those variables for analysis.
+            # with the definitions of image variables in allclinical01: eg, their knee lateral joint space narrowing appears to be some kind of max of the two projects. This is fine, because we don't use those variables for analysis.
             print("%s: %i people had readings for 15 but not 37; %i had readings for 37 but not 15; %i had readings for both" % (
                 timepoint, 
                 len(readings_for_15 - readings_for_37), 
@@ -1464,7 +1464,7 @@ class NonImageData():
         Make sure IDs are consistent across datasets they should be consistent in. 
         """
         print("\n***Validating that IDs look kosher")
-        self.all_ids = sorted(list(copy.deepcopy(self.original_dataframes['allclinical00']['id'])))
+        self.all_ids = sorted(list(copy.deepcopy(self.original_dataframes['allclinical01']['id'])))
         assert len(self.all_ids) == TOTAL_PEOPLE
         assert sorted(self.all_ids) == sorted(get_all_ids())
         assert len(set(self.all_ids)) == len(self.all_ids)
