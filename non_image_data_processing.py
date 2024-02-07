@@ -1121,8 +1121,8 @@ class NonImageData():
             # elif c == 'v01income':   # not using for JoCo data
             #     col_name = 'binarized_income_at_least_50k'
             #     all_clinical01_d[col_name] = (all_clinical01_d[c] >= '4: $50K to < $100K') * 1.
-            all_clinical01_d.loc[missing_data_idxs, col_name] = None
-            all_clinical01_d.loc[missing_data_idxs, c] = None
+            # all_clinical01_d.loc[missing_data_idxs, col_name] = None
+            # all_clinical01_d.loc[missing_data_idxs, c] = None
             print("Binarizing into column %s with mean %2.3f and %2.3f missing data" % (col_name, 
                 all_clinical01_d[col_name].mean(), 
                 pd.isnull(all_clinical01_d[col_name]).mean()))
