@@ -97,6 +97,7 @@ else:
     ALL_XRAY_DATA = json.loads(os.getenv('ALL_XRAY_DATA'))
     SEMIQUANTITATIVE_XRAY_DATA = json.loads(os.getenv('SEMIQUANTITATIVE_XRAY_DATA'))
     TESTING_OUTPUT_DIR = os.getenv('TESTING_OUTPUT_DIR')
+    ID_TYPE = os.getenv('ID_TYPE')
 
     BASE_IMAGE_DATA_DIR = os.getenv('BASE_IMAGE_DATA_DIR') # Set this path to point to the directory where you downloaded the IMAGE OAI data - eg, it should contain folders like "00m" for each timepoint. 
     print("BASE_IMAGE_DATA_DIR="+BASE_IMAGE_DATA_DIR)
@@ -318,7 +319,7 @@ def get_all_ids():
     """
     full_path = os.path.join(BASE_NON_IMAGE_DATA_DIR, BASELINE_CLINIC_DATA)
     d = pd.read_csv(full_path, sep='|')
-    ids = sorted(list(d['ID'].values.astype(int)))
+    ids = sorted(list(d['ID'].values.astype(ID_TYPE)))
     assert len(set(ids)) == len(ids)
     assert len(ids) == TOTAL_PEOPLE
     return ids
