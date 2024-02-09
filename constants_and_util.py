@@ -96,6 +96,7 @@ else:
     BASELINE_ENROLLEES_SEPARATOR = os.getenv('BASELINE_ENROLLEES_SEPARATOR')
     ALL_XRAY_DATA = json.loads(os.getenv('ALL_XRAY_DATA'))
     SEMIQUANTITATIVE_XRAY_DATA = json.loads(os.getenv('SEMIQUANTITATIVE_XRAY_DATA'))
+    VISITS_TO_FAR_FROM_XRAYS = json.loads(os.getenv('VISITS_TO_FAR_FROM_XRAYS'))
     TESTING_OUTPUT_DIR = os.getenv('TESTING_OUTPUT_DIR')
     ID_TYPE = os.getenv('ID_TYPE')
 

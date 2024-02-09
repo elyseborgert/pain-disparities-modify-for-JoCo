@@ -249,7 +249,7 @@ class NonImageData():
         print("\n\n***Filtering out visits too far from x-rays.")
         THRESHOLD_IN_DAYS = 90
         visits_to_bad_ids = {}
-        for visit_substring in ['00', '01', '03', '05', '06']:
+        for visit_substring in VISITS_TO_FAR_FROM_XRAYS:
             allclinical_df = copy.deepcopy(self.original_dataframes['allclinical%s' % visit_substring])
             xray_df = copy.deepcopy(self.original_dataframes['xray%s' % visit_substring])
             xray_df = xray_df.loc[xray_df['v%sexamtp' % visit_substring] == 'Bilateral PA Fixed Flexion Knee']
