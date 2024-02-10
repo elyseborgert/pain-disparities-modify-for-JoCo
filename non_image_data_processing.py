@@ -326,7 +326,7 @@ class NonImageData():
                         rows_to_filter_out = bad_rows_for_visit
                     else:
                         rows_to_filter_out = rows_to_filter_out | bad_rows_for_visit
-                self.processed_dataframes[k] = self.processed_dataframes[k].loc[~rows_to_filter_out]
+                # self.processed_dataframes[k] = self.processed_dataframes[k].loc[~rows_to_filter_out]    # not sure how we would use this with one timepoint
                 print("For dataframe %s, filtered out %i/%i rows as too far from x-ray date" % (k, rows_to_filter_out.sum(), len(rows_to_filter_out)))
 
     def make_drinking_and_smoking_dataframe(self):
