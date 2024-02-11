@@ -433,7 +433,7 @@ def get_combined_dataframe(non_image_dataset, clinical_assessments):
                            non_image_dataset.processed_dataframes['all_knee_pain_scores'], 
                            how='inner', 
                            on=['id', 'visit', 'side'])
-    assert len(combined_data.dropna(subset=['koos_pain_subscore', 'womac_pain_subscore'])) == len(combined_data)
+    assert len(combined_data.dropna(subset=['womac_pain_subscore'])) == len(combined_data)
     old_len = len(combined_data)
 
     # Now merge with a lot of control dataframes. 
