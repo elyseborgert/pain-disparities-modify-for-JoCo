@@ -467,7 +467,7 @@ def get_combined_dataframe(non_image_dataset, clinical_assessments):
     pd.set_option('max_rows', 500)
     print("Prior to dropping people missing socioeconomic status data, %i rows" % len(combined_data))
     combined_data = combined_data.dropna(
-        subset=['binarized_education_graduated_college', 'binarized_income_at_least_50k'])
+        subset=['binarized_education_graduated_college'])
     print("After dropping people missing socioeconomic status data, %i rows" % len(combined_data))
     combined_data = combined_data.dropna(subset=['p02hisp', 'p02race', 'p02sex', 'age_at_visit'])
     print("After dropping people missing age/race/sex data, %i rows" % len(combined_data))
