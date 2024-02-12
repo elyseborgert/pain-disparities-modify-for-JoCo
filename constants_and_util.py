@@ -194,8 +194,8 @@ IMAGE_SIDES = json.loads(os.getenv('IMAGE_SIDES'))
 KOOS_BINARIZATION_THRESH = float(os.getenv('KOOS_BINARIZATION_THRESH'))
 WOMAC_BINARIZATION_THRESH = float(os.getenv('WOMAC_BINARIZATION_THRESH'))
 
-AGE_RACE_SEX_SITE = ['C(age_at_visit)*C(p02sex)', 'C(p02hisp)', "C(p02race, Treatment(reference='1: White or Caucasian'))", 'C(v00site)']
-AGE_SEX_SITE_NO_RACE = ['C(age_at_visit)*C(p02sex)', 'C(v00site)']
+AGE_RACE_SEX_SITE = ['C(p02sex)', 'C(p02hisp)', "C(p02race, Treatment(reference='1: White or Caucasian'))", 'C(v00site)']
+AGE_SEX_SITE_NO_RACE = ['C(p02sex)', 'C(v00site)']
 
 KNEE_INJURY_OR_SURGERY = ['C(knee_surgery)', 'C(knee_injury)']
 MEDICAL_HISTORY = ['C(hrtat)', 
@@ -469,7 +469,7 @@ def get_combined_dataframe(non_image_dataset, clinical_assessments):
     combined_data = combined_data.dropna(
         subset=['binarized_education_graduated_college'])
     print("After dropping people missing socioeconomic status data, %i rows" % len(combined_data))
-    combined_data = combined_data.dropna(subset=['p02hisp', 'p02race', 'p02sex', 'age_at_visit'])
+    combined_data = combined_data.dropna(subset=['p02hisp', 'p02race', 'p02sex'])
     print("After dropping people missing age/race/sex data, %i rows" % len(combined_data))
 
     missing_data_fracs_by_col = []
