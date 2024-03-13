@@ -145,7 +145,7 @@ assert RESAMPLED_IMAGE_SIZE[0] == RESAMPLED_IMAGE_SIZE[1]
 IMAGE_DATASET_KWARGS = json.loads(os.getenv('IMAGE_DATASET_KWARGS'))
 
 GAPS_OF_INTEREST_COLS = ['race_black', 'binarized_income_at_least_50k', 'binarized_education_graduated_college', 'is_male']
-CLINICAL_CONTROL_COLUMNS = ['xrosfm', 'xrscfm','xrcyfm', 'xrjsm', 'xrchm','xrostm','xrsctm','xrcytm','xrattm','xrkl','xrosfl','xrscfl','xrcyfl', 'xrjsl','xrchl','xrostl','xrsctl','xrcytl','xrattl']
+CLINICAL_CONTROL_COLUMNS = json.loads(os.getenv('CLINICAL_CONTROL_COLUMNS'))
 OTHER_KOOS_PAIN_SUBSCORES = ['koos_function_score', 'koos_quality_of_life_score', 'koos_symptoms_score']
 MEDICATION_CODES = {'V00RXACTM':'Acetaminophen', 
                         'V00RXANALG':'Analgesic',
