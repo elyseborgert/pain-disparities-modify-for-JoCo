@@ -932,7 +932,7 @@ def train_one_model(experiment_to_run):
     all_training_results = pytorch_model.train(dataloaders=dataloaders, dataset_sizes=dataset_sizes)
 
     # stratify test performance by SES. 
-    high_ses_idxs = copy.deepcopy(datasets['test'].non_image_data['binarized_income_at_least_50k'] == True).values
+    high_ses_idxs = copy.deepcopy(datasets['test'].non_image_data['binarized_education_graduated_college'] == True).values
     y = copy.deepcopy(all_training_results['test_set_results']['test_y'])
     yhat = copy.deepcopy(all_training_results['test_set_results']['test_yhat'])
     binary_prediction = model_kwargs['binary_prediction']
