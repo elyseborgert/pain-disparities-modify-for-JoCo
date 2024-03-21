@@ -515,6 +515,8 @@ def ensure_barcodes_match(combined_df, image_codes):
     Sanity check: make sure non-image data matches image data. 
     """
     print("Ensuring that barcodes line up.")
+    if len(combined_df)==0:  # we need to stop things if the dataframe is empty
+        raise Exception("The combined_df appears to be empty within ensure_barcodes_match()!!")
     assert len(combined_df) == len(image_codes)
     for idx in range(len(combined_df)):
         barcode = str(combined_df.iloc[idx]['barcdbu'])

@@ -805,11 +805,11 @@ def write_out_individual_images_for_one_dataset(write_out_image_data,
                 else:
                     mylistnew.append(s)
         image_dataset.images=mylistnew
-        # print("match_image_dataset_to_non_image_dataset image_dataset has ", str(image_dataset.images))
+        print("match_image_dataset_to_non_image_dataset image_dataset has ", str(image_dataset.images))
         # print("we need to see what non_image_dataset looks like-",str(non_image_dataset.original_dataframes))
         # print("match_image_dataset_to_non_image_dataset non_image_dataset has ", str(non_image_dataset.processed_dataframes))
         combined_df, matched_images, image_codes = match_image_dataset_to_non_image_dataset(image_dataset, non_image_dataset)
-        # print("ensure_barcodes_match combined_df=",len(combined_df)," and matched_images=",len(matched_images)," and image_codes=",len(image_codes))
+        print("ensure_barcodes_match combined_df=",len(combined_df)," and matched_images=",len(matched_images)," and image_codes=",len(image_codes))
         # print("image_codes--",str(image_codes))
         # print("matched_images--",str(matched_images))
         ensure_barcodes_match(combined_df, image_codes)
