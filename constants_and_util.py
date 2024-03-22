@@ -480,7 +480,7 @@ def get_combined_dataframe(non_image_dataset, clinical_assessments):
 
     missing_data_fracs_by_col = pd.DataFrame(missing_data_fracs_by_col) 
     print(missing_data_fracs_by_col.sort_values(by='missing_data')[::-1])
-
+    print("end - get_combined_dataframe()")
     return combined_data
 
 def find_image_barcodes_that_pass_qc(non_image_dataset):
@@ -542,8 +542,10 @@ def match_image_dataset_to_non_image_dataset(image_dataset, non_image_dataset, s
     clinical_assessments = copy.deepcopy(non_image_dataset.processed_dataframes['kxr_sq_bu'])
     # assert clinical_assessments['barcdbu'].map(lambda x:len(x) == 12).all()   # we will assume our IDs are correct
     print(clinical_assessments.head())
-    print("Prior to filtering for images that pass QC, clinical_assessments len=%i and non_image_dataset len=%i" % (len(clinical_assessments),len(non_image_dataset)))
-
+    print("Prior to filtering for images that pass QC, clinical_assessments len=%i " % len(clinical_assessments))
+    print("...and non_image_dataset len=%i" % len(non_image_dataset.processed_dataframes))
+    print("...and non_image_dataset.processed_dataframes['all_knee_pain_scores'] len=%i" % len(non_image_dataset.processed_dataframes['all_knee_pain_scores']))
+    
     # wpg - we are going to assume all of our images pass QC (even though we have no QC measures in place)
     # acceptable_barcodes = find_image_barcodes_that_pass_qc(non_image_dataset)
     # clinical_assessments = clinical_assessments.loc[clinical_assessments['barcdbu'].map(lambda x:x in acceptable_barcodes)]
