@@ -795,15 +795,16 @@ def write_out_individual_images_for_one_dataset(write_out_image_data,
         print("image_dataset type=", type(image_dataset.images))
         
         # this is a patch because for some reason there is a \n attached to the end of the barcode value which we probably should remove
-        mylistnew=[]
-        if type(image_dataset.images) is list:
-            for s in image_dataset.images:
-                if type(s) is dict:
-                    s.update({"barcode": s["barcode"].replace("\n", "")})
-                    # not sure why the s.update needs to be on separate line before the append
-                    mylistnew.append(s)
-                else:
-                    mylistnew.append(s)
+        # DO NOT BELIEVE WE NEED THIS FOR JOCO DATA - wpg
+        # mylistnew=[]
+        # if type(image_dataset.images) is list:
+        #     for s in image_dataset.images:
+        #         if type(s) is dict:
+        #             s.update({"barcode": s["barcode"].replace("\n", "")})
+        #             # not sure why the s.update needs to be on separate line before the append
+        #             mylistnew.append(s)
+        #         else:
+        #             mylistnew.append(s)
         image_dataset.images=mylistnew
         # print("match_image_dataset_to_non_image_dataset image_dataset has ", str(image_dataset.images))  # this is a good bit of data so should not be printed unless needed
         # print("we need to see what non_image_dataset looks like-",str(non_image_dataset.original_dataframes))
