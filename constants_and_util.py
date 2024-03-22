@@ -542,7 +542,7 @@ def match_image_dataset_to_non_image_dataset(image_dataset, non_image_dataset, s
     clinical_assessments = copy.deepcopy(non_image_dataset.processed_dataframes['kxr_sq_bu'])
     # assert clinical_assessments['barcdbu'].map(lambda x:len(x) == 12).all()   # we will assume our IDs are correct
     print(clinical_assessments.head())
-    print("Prior to filtering for images that pass QC, %i images" % len(clinical_assessments))
+    print("Prior to filtering for images that pass QC, clinical_assessments len=%i and non_image_dataset len=%i" % (len(clinical_assessments),len(non_image_dataset)))
 
     # wpg - we are going to assume all of our images pass QC (even though we have no QC measures in place)
     # acceptable_barcodes = find_image_barcodes_that_pass_qc(non_image_dataset)
@@ -550,6 +550,8 @@ def match_image_dataset_to_non_image_dataset(image_dataset, non_image_dataset, s
     # print("After filtering for images that pass QC, %i images" % len(clinical_assessments)) # this doesn't filter out a lot of clinical assessments, even though a lot of values in the xray01 etc datasets are NA, because those values are already filtered out of the kxr_sq_bu -- you can't assign image scores to an image which isn't available. 
     
     combined_df = get_combined_dataframe(non_image_dataset, clinical_assessments)
+    if len(combined_df)==0:  # we need to stop things if the dataframe is empty
+        raise Exception("Within match_image_dataset_to_non_image_dataset, the combined_df appears to be empty!!")
     # if clinical_assessments:    # debugging
     # print("clinical_assessments=", str(clinical_assessments))
     #if combined_df:             # debugging
