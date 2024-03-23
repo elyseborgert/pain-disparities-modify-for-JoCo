@@ -805,7 +805,7 @@ def write_out_individual_images_for_one_dataset(write_out_image_data,
         #             mylistnew.append(s)
         #         else:
         #             mylistnew.append(s)
-        image_dataset.images=mylistnew
+        # image_dataset.images=mylistnew
         # print("match_image_dataset_to_non_image_dataset image_dataset has ", str(image_dataset.images))  # this is a good bit of data so should not be printed unless needed
         # print("we need to see what non_image_dataset looks like-",str(non_image_dataset.original_dataframes))
         # print("match_image_dataset_to_non_image_dataset non_image_dataset has ", str(non_image_dataset.processed_dataframes))
