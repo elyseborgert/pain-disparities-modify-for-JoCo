@@ -593,12 +593,14 @@ def match_image_dataset_to_non_image_dataset(image_dataset, non_image_dataset, s
     #         print("1st set matched_images #",len(matched_images))
     # print("matched_images again=", str(matched_images))
     combined_df['has_matched_image'] = [a is not None for a in matched_images]
+    print("what is within the combined_df['has_matched_image']:",combined_df['has_matched_image'])
     print("Fraction of clinical x-ray ratings with matched images")
     print(combined_df[['has_matched_image', 'visit', 'side']].groupby(['visit', 'side']).agg(['mean', 'sum']))
     idxs_to_keep = []
     for i in range(len(combined_df)):
         if combined_df['has_matched_image'].values[i]:
             idxs_to_keep.append(i)
+    print("we will keep the following idxs_to_keep values:",idxs_to_keep)
     combined_df = combined_df.iloc[idxs_to_keep]
     combined_df.index = range(len(combined_df))
     matched_images = [matched_images[i] for i in idxs_to_keep]
