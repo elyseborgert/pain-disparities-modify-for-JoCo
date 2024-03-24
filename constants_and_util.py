@@ -559,16 +559,17 @@ def match_image_dataset_to_non_image_dataset(image_dataset, non_image_dataset, s
     #if combined_df:             # debugging
     #print("combined_df=", str(combined_df))      # print the first three rows of the dataframe
     non_image_keys = list(combined_df['barcdbu'].map(str) + '*' + combined_df['side'])
-    #print("non_image_keys list=",str(non_image_keys))
+    print("non_image_keys list=",str(non_image_keys))
     non_image_keys = dict(zip(non_image_keys, range(len(non_image_keys))))
-    #print("non_image_keys dict=",str(non_image_keys))
+    print("non_image_keys dict=",str(non_image_keys))
     matched_images = [None for i in range(len(combined_df))]
-    #print("matched_images=", str(matched_images))
+    print("matched_images=", str(matched_images))
     image_codes = [None for i in range(len(combined_df))]
     #print("match_image_dataset_to_non_image_dataset combined_df=",len(combined_df)," and matched_images=",len(matched_images)," and image_codes=",len(image_codes))
     for i in range(len(image_dataset.images)):
         if i % 1000 == 0:
             print('Image %i/%i' % (i, len(image_dataset.images)))   # after every thousand images print out the number that was processed
+            print("image_dataset.images[i]=",image_dataset.images[i])  # want to see what this data looks like
         image = image_dataset.images[i]
         if not swap_left_and_right:
             left_key = str(image['barcode']) + '*left'
@@ -588,10 +589,10 @@ def match_image_dataset_to_non_image_dataset(image_dataset, non_image_dataset, s
             image_codes[idx] = right_key
 
         # this statement is strictly for debugging
-    #     if i % 1000 == 0:
-    #         print('right_key=',right_key,'/ left_key=',left_key)
-    #         print("1st set matched_images #",len(matched_images))
-    # print("matched_images again=", str(matched_images))
+        if i % 1000 == 0:
+            print('right_key=',right_key,'/ left_key=',left_key)
+            print("1st set matched_images #",len(matched_images))
+    print("matched_images again=", str(matched_images))
     combined_df['has_matched_image'] = [a is not None for a in matched_images]
     print("what is within the combined_df['has_matched_image']:",combined_df['has_matched_image'])
     print("Fraction of clinical x-ray ratings with matched images")
