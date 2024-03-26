@@ -224,8 +224,9 @@ class XRayImageDataset:
                         'full_path':image_path,
                         'subject':imgMetaDataArray[IMG_METADATA_P_SUBJECT],
                         'unnormalized_image_array':image_array, 
-                        'barcode':imgMetaDataArray[IMG_METADATA_P_BARCODE]
+                        'barcode':imgMetaDataArray[IMG_METADATA_P_BARCODE].replace("\n", "")
                         })
+                    # note we need to remove any \n characters from the barcode data
 
     def plot_pipeline_examples(self, n_examples):
         """
@@ -794,8 +795,7 @@ def write_out_individual_images_for_one_dataset(write_out_image_data,
                                                                    i_promise_i_really_want_to_use_the_blinded_hold_out_set=i_promise_i_really_want_to_use_the_blinded_hold_out_set)
         print("image_dataset type=", type(image_dataset.images))
         
-        # this is a patch because for some reason there is a \n attached to the end of the barcode value which we probably should remove
-        # DO NOT BELIEVE WE NEED THIS FOR JOCO DATA - wpg
+        # this is a patch because for some reason there is a \n attached to the end of the barcode value which we probably should remove (at least this is a problem with windows EOL characters) - wpg
         # mylistnew=[]
         # if type(image_dataset.images) is list:
         #     for s in image_dataset.images:
