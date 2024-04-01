@@ -570,6 +570,7 @@ def match_image_dataset_to_non_image_dataset(image_dataset, non_image_dataset, s
         if i % 1000 == 0:
             print('Image %i/%i' % (i, len(image_dataset.images)))   # after every thousand images print out the number that was processed
             print("image_dataset.images[i]=",image_dataset.images[i])  # want to see what this data looks like
+            print("image_dataset.images[i]['barcode']=",image_dataset.images[i]['barcode'].replace("\n", ""))
         image = image_dataset.images[i]
         if not swap_left_and_right:
             left_key = str(image['barcode'].replace("\n", "")) + '*left'
