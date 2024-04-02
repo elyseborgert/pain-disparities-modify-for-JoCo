@@ -520,8 +520,7 @@ def ensure_barcodes_match(combined_df, image_codes):
     assert len(combined_df) == len(image_codes)
     for idx in range(len(combined_df)):
         barcode = str(combined_df.iloc[idx]['barcdbu'].replace("\n", ""))
-        if len(barcode) == 11:
-            barcode = '0' + barcode
+        # removing the leading zero the code was adding to the barcode
         side = str(combined_df.iloc[idx]['side'])
         code_in_df = barcode + '*' + side
 
