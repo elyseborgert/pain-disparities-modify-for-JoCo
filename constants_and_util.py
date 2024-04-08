@@ -506,7 +506,7 @@ def find_image_barcodes_that_pass_qc(non_image_dataset):
             assert len(good_barcodes_for_visit.intersection(all_good_barcodes)) == 0
             all_good_barcodes = all_good_barcodes.union(good_barcodes_for_visit)
     # all_good_barcodes = ['0' + str(int(a)) for a in all_good_barcodes] # we do not want an extra digit added for Joco
-    assert all([len(a) == 12 for a in all_good_barcodes])
+    # assert all([len(a) == 12 for a in all_good_barcodes]) # joco barcodes are not 12 numbers long so not important
     all_good_barcodes = set(all_good_barcodes)
     return all_good_barcodes
 
