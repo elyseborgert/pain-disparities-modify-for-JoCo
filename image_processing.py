@@ -767,6 +767,7 @@ def write_out_individual_images_for_one_dataset(write_out_image_data,
     image_dataset_kwargs['show_both_knees_in_each_image'] = show_both_knees_in_each_image
     image_dataset_kwargs['crop_to_just_the_knee'] = crop_to_just_the_knee
     image_dataset = XRayImageDataset(**image_dataset_kwargs)
+    print(image_dataset)
     for dataset in ['train', 'val', 'test', 'BLINDED_HOLD_OUT_DO_NOT_USE']:
         print("Writing out individual images for dataset %s" % dataset)
         base_path = get_base_dir_for_individual_image(dataset=dataset, 
