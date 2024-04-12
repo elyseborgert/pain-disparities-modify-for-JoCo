@@ -1000,14 +1000,16 @@ class PytorchImagesDataset(Dataset):
         """
         assert dataset in ['train', 'val', 'test', 'BLINDED_HOLD_OUT_DO_NOT_USE']
         assert downsample_factor_on_reload in [None, 0.7, 0.5, 0.3]
-        assert y_col in ['koos_pain_subscore', 
-        'womac_pain_subscore', 
-        'binarized_koos_pain_subscore', 
-        'binarized_womac_pain_subscore',
-        'xrkl', 
-        'koos_pain_subscore_residual',
-        'binarized_education_graduated_college', 
-        'binarized_income_at_least_50k']
+        # assert y_col in ['koos_pain_subscore', 
+        # 'womac_pain_subscore', 
+        # 'binarized_koos_pain_subscore', 
+        # 'binarized_womac_pain_subscore',
+        # 'xrkl', 
+        # 'koos_pain_subscore_residual',
+        # 'binarized_education_graduated_college', 
+        # 'binarized_income_at_least_50k']
+
+        assert y_col in ['womac_pain_subscore']  # only item being predicted in JoCo data
 
         assert normalization_method in ['imagenet_statistics', 'our_statistics', 'zscore_individually']
         assert transform in [None, 'random_translation', 'random_translation_and_then_random_horizontal_flip']
