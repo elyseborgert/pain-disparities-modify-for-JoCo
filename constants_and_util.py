@@ -519,7 +519,7 @@ def ensure_barcodes_match(combined_df, image_codes):
         raise Exception("The combined_df appears to be empty within ensure_barcodes_match()!!")
     assert len(combined_df) == len(image_codes)
     for idx in range(len(combined_df)):
-        barcode = str(combined_df.iloc[idx]['barcdbu'].replace("\n", ""))
+        barcode = str(combined_df.iloc[idx]['barcdbu'])
         # removing the leading zero the code was adding to the barcode
         side = str(combined_df.iloc[idx]['side'])
         code_in_df = barcode + '*' + side
@@ -569,14 +569,14 @@ def match_image_dataset_to_non_image_dataset(image_dataset, non_image_dataset, s
         if i % 1000 == 0:
             print('Image %i/%i' % (i, len(image_dataset.images)))   # after every thousand images print out the number that was processed
             print("image_dataset.images[i]=",image_dataset.images[i])  # want to see what this data looks like
-            print("image_dataset.images[i]['barcode']=",image_dataset.images[i]['barcode'].replace("\n", ""))
+            print("image_dataset.images[i]['barcode']=",image_dataset.images[i]['barcode'])
         image = image_dataset.images[i]
         if not swap_left_and_right:
-            left_key = str(image['barcode'].replace("\n", "")) + '*left'
-            right_key = str(image['barcode'].replace("\n", ""))  + '*right'
+            left_key = str(image['barcode']) + '*left'
+            right_key = str(image['barcode'])  + '*right'
         else:
-            right_key = str(image['barcode'].replace("\n", "")) + '*left'
-            left_key = str(image['barcode'].replace("\n", ""))  + '*right'
+            right_key = str(image['barcode']) + '*left'
+            left_key = str(image['barcode'])  + '*right'
         if left_key in non_image_keys: 
             idx = non_image_keys[left_key]
             assert matched_images[idx] is None

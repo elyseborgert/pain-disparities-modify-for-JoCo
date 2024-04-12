@@ -224,7 +224,7 @@ class XRayImageDataset:
                         'full_path':image_path,
                         'subject':imgMetaDataArray[IMG_METADATA_P_SUBJECT],
                         'unnormalized_image_array':image_array, 
-                        'barcode':imgMetaDataArray[IMG_METADATA_P_BARCODE].replace("\n", "")
+                        'barcode':imgMetaDataArray[IMG_METADATA_P_BARCODE]
                         })
                     # note we need to remove any \n characters from the barcode data
 
@@ -801,7 +801,7 @@ def write_out_individual_images_for_one_dataset(write_out_image_data,
         # if type(image_dataset.images) is list:
         #     for s in image_dataset.images:
         #         if type(s) is dict:
-        #             s.update({"barcode": s["barcode"].replace("\n", "")})
+        #             s.update({"barcode": s["barcode"]})
         #             # not sure why the s.update needs to be on separate line before the append
         #             mylistnew.append(s)
         #         else:
