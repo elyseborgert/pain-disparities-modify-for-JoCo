@@ -1216,8 +1216,8 @@ class PytorchImagesDataset(Dataset):
         # binarized_income_at_least_50k = self.non_image_data['binarized_income_at_least_50k'].iloc[idx]
         # assert binarized_income_at_least_50k in [0, 1]
 
-        site = self.non_image_data['v00site'].iloc[idx]
-        assert site in ['A', 'B', 'C', 'D', 'E']
+        # site = self.non_image_data['v00site'].iloc[idx]
+        # assert site in ['A', 'B', 'C', 'D', 'E']
 
         assert ~np.isnan(yval)
 
@@ -1226,8 +1226,7 @@ class PytorchImagesDataset(Dataset):
         'klg':klg,
         'binarized_education_graduated_college':binarized_education_graduated_college,
         'additional_features_to_predict':additional_features, 
-        'additional_features_are_not_nan':additional_features_are_not_nan, 
-        'site':site}
+        'additional_features_are_not_nan':additional_features_are_not_nan}
         return sample
 
 if __name__ == '__main__':
