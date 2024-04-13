@@ -368,7 +368,7 @@ class TransferLearningPytorchModel():
         else:
             self.metric_to_use_as_stopping_criterion = 'val_negative_rmse'
         assert (self.n_additional_image_features_to_predict > 0) == (self.additional_loss_weighting > 0)
-        assert self.n_additional_image_features_to_predict in [0, 3, 19, 22]
+        assert self.n_additional_image_features_to_predict in [0, 3, 15, 22]
 
         assert pretrained_model_name in ['resnet18', 'resnet34', 'resnet50', 'resnet101', 'resnet152', 'pretrained_mura_densenet']
          
