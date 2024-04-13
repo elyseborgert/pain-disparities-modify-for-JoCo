@@ -603,8 +603,8 @@ class TransferLearningPytorchModel():
                 # print("labels on self.n_additional_image_features_to_predict > 0=",str(labels)) # debug
                 loss = self.loss_criterion(input=outputs, target=labels) 
 
-                print("additional_features_to_predict",additional_features_to_predict)
-                print("additional_feature_outputs",additional_feature_outputs)
+                # print("additional_features_to_predict",additional_features_to_predict)
+                # print("additional_feature_outputs",additional_feature_outputs)
                 # basically, we only add to the additional feature loss if a feature is not NaN.  
                 additional_feature_losses = ((additional_features_to_predict - additional_feature_outputs) ** 2) * additional_features_are_not_nan
                 additional_loss = additional_feature_losses.sum(dim=1).mean(dim=0)
