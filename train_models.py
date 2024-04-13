@@ -1003,7 +1003,7 @@ def generate_random_config():
     'show_both_knees_in_each_image':show_both_knees_in_each_image,
     'downsample_factor_on_reload':random.choice([None]) if not crop_to_just_the_knee else random.choice([0.5, None]),#random.choice([None, 0.7, 0.5, 0.3]), # Originally images were 512 x 512 and downsample factors were [None, 0.7]. Now images are 1024 by 1024. 
     'weighted_ses_sampler_kwargs':None, 
-    'additional_features_to_predict':random.choice([None, CLINICAL_CONTROL_COLUMNS, OTHER_KOOS_PAIN_SUBSCORES, CLINICAL_CONTROL_COLUMNS+OTHER_KOOS_PAIN_SUBSCORES]),
+    'additional_features_to_predict':random.choice([None, CLINICAL_CONTROL_COLUMNS]),
     'seed_to_further_shuffle_train_test_val_sets':None}
 
     if (dataset_kwargs['downsample_factor_on_reload'] in [0.7, None]) and not crop_to_just_the_knee:
