@@ -539,7 +539,7 @@ class TransferLearningPytorchModel():
         concatenated_binarized_education_graduated_college = []
         # concatenated_binarized_income_at_least_50k = []
         concatenated_numerical_klg = []
-        concatenated_site = []
+        # concatenated_site = []
 
         if self.n_additional_image_features_to_predict > 0:
             loss_additional_loss_ratios = [] # also keep track of how big the additional regularization loss is relative to the main loss. 
@@ -561,7 +561,7 @@ class TransferLearningPytorchModel():
             assert len(numerical_klg) == len(one_hot_klg)
             binarized_education_graduated_college = np.array(data['binarized_education_graduated_college'])
             # binarized_income_at_least_50k = np.array(data['binarized_income_at_least_50k'])
-            concatenated_site += list(np.array(data['site']))
+            # concatenated_site += list(np.array(data['site']))
             concatenated_binarized_education_graduated_college += list(binarized_education_graduated_college)
             # concatenated_binarized_income_at_least_50k += list(binarized_income_at_least_50k)
             concatenated_numerical_klg += list(numerical_klg) 
@@ -694,12 +694,12 @@ class TransferLearningPytorchModel():
                             y=np.array(concatenated_labels)[klg_idxs], yhat=np.array(concatenated_outputs)[klg_idxs], binary_prediction=False)
 
                     # Stratify performance excluding one site at a time. 
-                    metrics_for_epoch['stratified_by_site'] = {}
-                    concatenated_site = np.array(concatenated_site)
-                    for site_val in sorted(list(set(concatenated_site))):
-                        exclude_site_idxs = concatenated_site != site_val
-                        metrics_for_epoch['stratified_by_site']['every_site_but_%s' % site_val] = analysis.assess_performance(
-                            y=np.array(concatenated_labels)[exclude_site_idxs], yhat=np.array(concatenated_outputs)[exclude_site_idxs], binary_prediction=False)
+                    # metrics_for_epoch['stratified_by_site'] = {}
+                    # concatenated_site = np.array(concatenated_site)
+                    # for site_val in sorted(list(set(concatenated_site))):
+                    #     exclude_site_idxs = concatenated_site != site_val
+                    #     metrics_for_epoch['stratified_by_site']['every_site_but_%s' % site_val] = analysis.assess_performance(
+                    #         y=np.array(concatenated_labels)[exclude_site_idxs], yhat=np.array(concatenated_outputs)[exclude_site_idxs], binary_prediction=False)
 
 
             else:
@@ -913,9 +913,9 @@ def train_one_model(experiment_to_run):
     elif experiment_to_run == 'blur_image':
         dataset_kwargs, model_kwargs = generate_config_that_performs_well('koos_pain_subscore')
         dataset_kwargs['blur_filter'] = random.choice([1/2., 1/4., 1/8., 1/16., 1/32., 1/64.])#random.choice([0, 1, 2, 5, 8, 10, 15, 20, 50])
-    elif experiment_to_run == 'hold_out_one_imaging_site':
-        dataset_kwargs, model_kwargs = generate_config_that_performs_well('koos_pain_subscore')
-        dataset_kwargs['hold_out_one_imaging_site_kwargs'] = {'site_to_remove':random.choice(['A', 'B', 'C', 'D', 'E'])}
+    # elif experiment_to_run == 'hold_out_one_imaging_site':
+    #     dataset_kwargs, model_kwargs = generate_config_that_performs_well('koos_pain_subscore')
+    #     dataset_kwargs['hold_out_one_imaging_site_kwargs'] = {'site_to_remove':random.choice(['A', 'B', 'C', 'D', 'E'])}
     else:
         raise Exception("not a valid experiment")
 
