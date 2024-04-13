@@ -537,7 +537,7 @@ class TransferLearningPytorchModel():
         concatenated_labels = []
         concatenated_outputs = []
         concatenated_binarized_education_graduated_college = []
-        concatenated_binarized_income_at_least_50k = []
+        # concatenated_binarized_income_at_least_50k = []
         concatenated_numerical_klg = []
         concatenated_site = []
 
@@ -560,10 +560,10 @@ class TransferLearningPytorchModel():
             numerical_klg = np.nonzero(np.array(one_hot_klg))[1]
             assert len(numerical_klg) == len(one_hot_klg)
             binarized_education_graduated_college = np.array(data['binarized_education_graduated_college'])
-            binarized_income_at_least_50k = np.array(data['binarized_income_at_least_50k'])
+            # binarized_income_at_least_50k = np.array(data['binarized_income_at_least_50k'])
             concatenated_site += list(np.array(data['site']))
             concatenated_binarized_education_graduated_college += list(binarized_education_graduated_college)
-            concatenated_binarized_income_at_least_50k += list(binarized_income_at_least_50k)
+            # concatenated_binarized_income_at_least_50k += list(binarized_income_at_least_50k)
             concatenated_numerical_klg += list(numerical_klg) 
 
             # wrap them in Variable
@@ -657,7 +657,7 @@ class TransferLearningPytorchModel():
             metrics_for_epoch['%s_r' % phase] = correlation_and_rmse['r']
 
             print("Correlation between binarized_education_graduated_college and labels: %2.3f" % pearsonr(concatenated_binarized_education_graduated_college, concatenated_labels)[0])
-            print("Correlation between binarized_income_at_least_50k and labels: %2.3f" % pearsonr(concatenated_binarized_income_at_least_50k, concatenated_labels)[0])
+            # print("Correlation between binarized_income_at_least_50k and labels: %2.3f" % pearsonr(concatenated_binarized_income_at_least_50k, concatenated_labels)[0])
 
             # if Koos score, also compute AUC + AUPRC for the binarized versions. 
             if self.y_col == 'koos_pain_subscore': 
@@ -668,8 +668,7 @@ class TransferLearningPytorchModel():
                 metrics_for_epoch['%s_binarized_auc' % phase] = binarized_auc_and_auprc['auc']
                 metrics_for_epoch['%s_binarized_auprc' % phase] = binarized_auc_and_auprc['auprc']
                 
-                metrics_for_epoch['%s_ses_betas' % phase] = {'binarized_education_graduated_college_betas':None, 
-                'binarized_income_at_least_50k_betas':None}
+                metrics_for_epoch['%s_ses_betas' % phase] = {'binarized_education_graduated_college_betas':None}
 
                 if phase == 'test':
                     # compute SES pain gaps for KLG >= 2. 
@@ -681,11 +680,10 @@ class TransferLearningPytorchModel():
                     income_pain_gaps = analysis.compare_pain_levels_for_people_geq_klg_2(yhat=np.array(concatenated_outputs), 
                         y=np.array(concatenated_labels), 
                         klg=np.array(concatenated_numerical_klg), 
-                        ses=np.array(concatenated_binarized_income_at_least_50k), 
+                        ses=np.array(concatenated_binarized_education_graduated_college), 
                         y_col=self.y_col)
 
-                    metrics_for_epoch['%s_pain_gaps_klg_geq_2' % phase] = {'binarized_education_graduated_college':education_pain_gaps, 
-                    'binarized_income_at_least_50k':income_pain_gaps}
+                    metrics_for_epoch['%s_pain_gaps_klg_geq_2' % phase] = {'binarized_education_graduated_college':education_pain_gaps}
                 
                 if phase == 'test' or phase == 'val':
                     # Stratify test performance by KLG. 
@@ -858,50 +856,50 @@ def train_one_model(experiment_to_run):
         dataset_kwargs, model_kwargs = generate_config_that_performs_well('womac_pain_subscore')
     elif experiment_to_run == 'train_best_model_continuous':
         dataset_kwargs, model_kwargs = generate_config_that_performs_well('womac_pain_subscore')
-    elif experiment_to_run == 'increase_diversity':
-        dataset_kwargs, model_kwargs = generate_config_that_performs_well('koos_pain_subscore')
-        ses_col = random.choice(['binarized_income_at_least_50k', 'binarized_education_graduated_college'])
-        n_seeds_to_fit = 5
-        if ses_col == 'race_black':
-            minority_val = 1
-        else:
-            minority_val = 0
-        if random.random() < 1./(n_seeds_to_fit + 1.):
-            exclude_minority_group = True
-        else:
-            exclude_minority_group = False
-        dataset_kwargs['increase_diversity_kwargs'] = {'ses_col':ses_col, 'minority_val':minority_val, 'exclude_minority_group':exclude_minority_group}
-        if not dataset_kwargs['increase_diversity_kwargs']['exclude_minority_group']:
-            dataset_kwargs['increase_diversity_kwargs']['majority_group_seed'] = random.choice(range(n_seeds_to_fit))
-        else:
-            dataset_kwargs['increase_diversity_kwargs']['majority_group_seed'] = None
-    elif experiment_to_run == 'change_ses_weighting':
-        dataset_kwargs, model_kwargs = generate_config_that_performs_well('koos_pain_subscore')
-        ses_col = 'race_black'
-        if ses_col == 'binarized_income_at_least_50k':
-            p = random.choice([0, 1])
-        elif ses_col == 'binarized_education_graduated_college':
-            p = random.choice([0, 1])
-        elif ses_col == 'race_black':
-            p = 0 # remove minority group; can't remove majority group because minority is too small. 
-        else:
-            raise Exception("invalid ses col")
+    # elif experiment_to_run == 'increase_diversity':
+    #     dataset_kwargs, model_kwargs = generate_config_that_performs_well('koos_pain_subscore')
+    #     ses_col = random.choice(['binarized_income_at_least_50k', 'binarized_education_graduated_college'])
+    #     n_seeds_to_fit = 5
+    #     if ses_col == 'race_black':
+    #         minority_val = 1
+    #     else:
+    #         minority_val = 0
+    #     if random.random() < 1./(n_seeds_to_fit + 1.):
+    #         exclude_minority_group = True
+    #     else:
+    #         exclude_minority_group = False
+    #     dataset_kwargs['increase_diversity_kwargs'] = {'ses_col':ses_col, 'minority_val':minority_val, 'exclude_minority_group':exclude_minority_group}
+    #     if not dataset_kwargs['increase_diversity_kwargs']['exclude_minority_group']:
+    #         dataset_kwargs['increase_diversity_kwargs']['majority_group_seed'] = random.choice(range(n_seeds_to_fit))
+    #     else:
+    #         dataset_kwargs['increase_diversity_kwargs']['majority_group_seed'] = None
+    # elif experiment_to_run == 'change_ses_weighting':
+    #     dataset_kwargs, model_kwargs = generate_config_that_performs_well('koos_pain_subscore')
+    #     ses_col = 'race_black'
+    #     if ses_col == 'binarized_income_at_least_50k':
+    #         p = random.choice([0, 1])
+    #     elif ses_col == 'binarized_education_graduated_college':
+    #         p = random.choice([0, 1])
+    #     elif ses_col == 'race_black':
+    #         p = 0 # remove minority group; can't remove majority group because minority is too small. 
+    #     else:
+    #         raise Exception("invalid ses col")
 
-        dataset_kwargs['weighted_ses_sampler_kwargs'] = {'ses_col':ses_col, 
-                                'covs':None,#DEMOGRAPHIC_CONTROLS + ['C(xrkl)'], 
-                                'p_high_ses':p,
-                                'use_propensity_scores':False}
-    elif experiment_to_run == 'change_ses_weighting_with_propensity_matching':
-        dataset_kwargs, model_kwargs = generate_config_that_performs_well('koos_pain_subscore')
-        dataset_kwargs['weighted_ses_sampler_kwargs'] = {'ses_col':'binarized_income_at_least_50k', 
-                                'covs':AGE_RACE_SEX_SITE + ['C(xrkl)'], 
-                                'p_high_ses':random.choice([0., 0.5, 1.]),#random.choice([.1, .25, .5, .75, .9]), 
-                                'use_propensity_scores':True}
-    elif experiment_to_run == 'remove_correlation_between_pain_and_ses':
-        dataset_kwargs, model_kwargs = generate_config_that_performs_well('koos_pain_subscore')
-        dataset_kwargs['remove_correlation_between_pain_and_ses_kwargs'] = {'ses_col':random.choice(['binarized_income_at_least_50k', 
-            'binarized_education_graduated_college', 'race_black']), 
-        'pain_col':'koos_pain_subscore'}
+    #     dataset_kwargs['weighted_ses_sampler_kwargs'] = {'ses_col':ses_col, 
+    #                             'covs':None,#DEMOGRAPHIC_CONTROLS + ['C(xrkl)'], 
+    #                             'p_high_ses':p,
+    #                             'use_propensity_scores':False}
+    # elif experiment_to_run == 'change_ses_weighting_with_propensity_matching':
+    #     dataset_kwargs, model_kwargs = generate_config_that_performs_well('koos_pain_subscore')
+    #     dataset_kwargs['weighted_ses_sampler_kwargs'] = {'ses_col':'binarized_income_at_least_50k', 
+    #                             'covs':AGE_RACE_SEX_SITE + ['C(xrkl)'], 
+    #                             'p_high_ses':random.choice([0., 0.5, 1.]),#random.choice([.1, .25, .5, .75, .9]), 
+    #                             'use_propensity_scores':True}
+    # elif experiment_to_run == 'remove_correlation_between_pain_and_ses':
+    #     dataset_kwargs, model_kwargs = generate_config_that_performs_well('koos_pain_subscore')
+    #     dataset_kwargs['remove_correlation_between_pain_and_ses_kwargs'] = {'ses_col':random.choice(['binarized_income_at_least_50k', 
+    #         'binarized_education_graduated_college', 'race_black']), 
+    #     'pain_col':'koos_pain_subscore'}
     elif experiment_to_run == 'train_on_both_knees':
         dataset_kwargs, model_kwargs = generate_random_config()
         dataset_kwargs['show_both_knees_in_each_image'] = True
@@ -972,10 +970,10 @@ def generate_random_config():
     Checked. 
     """
     #print("Random state at the beginning is", random.getstate())
-    y_col = random.choice(['koos_pain_subscore'])#, 'binarized_koos_pain_subscore'])#random.choice(['binarized_education_graduated_college', 'binarized_income_at_least_50k', 'koos_pain_subscore_residual'])
-    if y_col in ['binarized_koos_pain_subscore', 'binarized_education_graduated_college', 'binarized_income_at_least_50k']:
+    y_col = random.choice(['womac_pain_subscore'])#, 'binarized_koos_pain_subscore'])#random.choice(['binarized_education_graduated_college', 'binarized_income_at_least_50k', 'koos_pain_subscore_residual'])
+    if y_col in ['binarized_education_graduated_college']:
         binary_prediction = True
-    elif y_col in ['koos_pain_subscore', 'xrkl', 'koos_pain_subscore_residual']:
+    elif y_col in ['womac_pain_subscore', 'xrkl']:
         binary_prediction = False
     else:
         raise Exception("Not a valid y column")

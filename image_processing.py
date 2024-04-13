@@ -621,7 +621,7 @@ def predict_yhat_from_embeddings(all_train_embeddings,
     """
     assert list(all_train_embeddings.keys()) == list(all_test_embeddings.keys())
     all_yhat = []
-    for y_col in ['koos_pain_subscore', 'womac_pain_subscore']:
+    for y_col in ['womac_pain_subscore']:
         for alpha in [10 ** a for a in np.arange(-3, 4, .5)]:
             for embedding_method in all_train_embeddings.keys():
                 print("Embedding method %s" % embedding_method)
@@ -1009,7 +1009,7 @@ class PytorchImagesDataset(Dataset):
         # 'binarized_education_graduated_college', 
         # 'binarized_income_at_least_50k']
 
-        assert y_col in ['womac_pain_subscore']  # only item being predicted in JoCo data
+        assert y_col in ['womac_pain_subscore','xrkl','binarized_education_graduated_college']  # only items being predicted in JoCo data
 
         assert normalization_method in ['imagenet_statistics', 'our_statistics', 'zscore_individually']
         assert transform in [None, 'random_translation', 'random_translation_and_then_random_horizontal_flip']
@@ -1092,24 +1092,25 @@ class PytorchImagesDataset(Dataset):
 
 
         if 'binarized_' in y_col:
-            if 'koos' in y_col:
-                assert y_col not in list(self.non_image_data.columns)
-                self.non_image_data[y_col] = binarize_koos(self.non_image_data['koos_pain_subscore'].values)
-                print("Using binary column %s as y_col, a fraction %2.3f are positive (high pain) examples <= threshold %2.3f" % 
-                (y_col, self.non_image_data[y_col].mean(), KOOS_BINARIZATION_THRESH))
-            elif 'womac' in y_col:
+            # if 'koos' in y_col:
+            #     assert y_col not in list(self.non_image_data.columns)
+            #     self.non_image_data[y_col] = binarize_koos(self.non_image_data['koos_pain_subscore'].values)
+            #     print("Using binary column %s as y_col, a fraction %2.3f are positive (high pain) examples <= threshold %2.3f" % 
+            #     (y_col, self.non_image_data[y_col].mean(), KOOS_BINARIZATION_THRESH))
+            # el
+            if 'womac' in y_col:
                 assert y_col not in list(self.non_image_data.columns)
                 self.non_image_data[y_col] = binarize_womac(self.non_image_data['womac_pain_subscore'].values)
                 print("Using binary column %s as y_col, a fraction %2.3f are positive (high pain) examples > threshold %2.3f" % 
                 (y_col, self.non_image_data[y_col].mean(), WOMAC_BINARIZATION_THRESH))
 
         # add column with residual. 
-        if y_col == 'koos_pain_subscore_residual':
-            assert len(self.non_image_data[['koos_pain_subscore', 'xrkl']].dropna()) == len(self.non_image_data)
-            pain_kl_model = sm.OLS.from_formula('koos_pain_subscore ~ C(xrkl)', data=self.non_image_data).fit()
-            assert 'koos_pain_subscore_residual' not in self.non_image_data.columns
-            self.non_image_data['koos_pain_subscore_residual'] = self.non_image_data['koos_pain_subscore'].values - pain_kl_model.predict(self.non_image_data).values
-            print(pain_kl_model.summary())
+        # if y_col == 'koos_pain_subscore_residual':
+        #     assert len(self.non_image_data[['koos_pain_subscore', 'xrkl']].dropna()) == len(self.non_image_data)
+        #     pain_kl_model = sm.OLS.from_formula('koos_pain_subscore ~ C(xrkl)', data=self.non_image_data).fit()
+        #     assert 'koos_pain_subscore_residual' not in self.non_image_data.columns
+        #     self.non_image_data['koos_pain_subscore_residual'] = self.non_image_data['koos_pain_subscore'].values - pain_kl_model.predict(self.non_image_data).values
+        #     print(pain_kl_model.summary())
             
         self.y_col = y_col
         self.transform = transform
@@ -1212,8 +1213,8 @@ class PytorchImagesDataset(Dataset):
         binarized_education_graduated_college = self.non_image_data['binarized_education_graduated_college'].iloc[idx]
         assert binarized_education_graduated_college in [0, 1]
 
-        binarized_income_at_least_50k = self.non_image_data['binarized_income_at_least_50k'].iloc[idx]
-        assert binarized_income_at_least_50k in [0, 1]
+        # binarized_income_at_least_50k = self.non_image_data['binarized_income_at_least_50k'].iloc[idx]
+        # assert binarized_income_at_least_50k in [0, 1]
 
         site = self.non_image_data['v00site'].iloc[idx]
         assert site in ['A', 'B', 'C', 'D', 'E']
@@ -1224,7 +1225,6 @@ class PytorchImagesDataset(Dataset):
         'y':yval, 
         'klg':klg,
         'binarized_education_graduated_college':binarized_education_graduated_college,
-        'binarized_income_at_least_50k':binarized_income_at_least_50k,
         'additional_features_to_predict':additional_features, 
         'additional_features_are_not_nan':additional_features_are_not_nan, 
         'site':site}
