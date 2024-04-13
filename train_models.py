@@ -1114,7 +1114,7 @@ def generate_config_that_performs_well(variable_to_predict):
             "binary_prediction": False,
             "conv_layers_before_end_to_unfreeze": 12,
             "fully_connected_bias_initialization": 90,
-            "n_additional_image_features_to_predict": 19,
+            "n_additional_image_features_to_predict": 15,
             "num_epochs": 15,
             "optimizer_kwargs": {
                 "betas": [
@@ -1156,7 +1156,7 @@ def generate_config_that_performs_well(variable_to_predict):
             "binary_prediction": True,
             "conv_layers_before_end_to_unfreeze": 14,
             "fully_connected_bias_initialization": None,
-            "n_additional_image_features_to_predict": 19,
+            "n_additional_image_features_to_predict": 15,
             "num_epochs": 10,
             "optimizer_kwargs": {
                 "betas": [
