@@ -603,6 +603,8 @@ class TransferLearningPytorchModel():
                 # print("labels on self.n_additional_image_features_to_predict > 0=",str(labels)) # debug
                 loss = self.loss_criterion(input=outputs, target=labels) 
 
+                print("additional_features_to_predict",additional_features_to_predict)
+                print("additional_feature_outputs",additional_feature_outputs)
                 # basically, we only add to the additional feature loss if a feature is not NaN.  
                 additional_feature_losses = ((additional_features_to_predict - additional_feature_outputs) ** 2) * additional_features_are_not_nan
                 additional_loss = additional_feature_losses.sum(dim=1).mean(dim=0)
@@ -1065,11 +1067,11 @@ def generate_random_config():
     if model_kwargs['n_additional_image_features_to_predict'] > 0:
         if binary_prediction:
             model_kwargs['additional_loss_weighting'] = random.choice([0.1, 0.5, 1, 2, 5, 10, 20]) # tried smaller values, didn't do as well. 
-        elif y_col == 'koos_pain_subscore_residual':
-            model_kwargs['additional_loss_weighting'] = random.choice([.1, 1, 5, 10, 50, 100])
-        elif y_col == 'koos_pain_subscore':
-            # need a higher weighting because this loss is on a larger scale (Koos ranges from 0 - 100).
-            model_kwargs['additional_loss_weighting'] = random.choice([1, 5, 10, 50, 100, 500, 1000, 5000, 10000])
+        # elif y_col == 'koos_pain_subscore_residual':
+        #     model_kwargs['additional_loss_weighting'] = random.choice([.1, 1, 5, 10, 50, 100])
+        # elif y_col == 'koos_pain_subscore':
+        #     # need a higher weighting because this loss is on a larger scale (Koos ranges from 0 - 100).
+        #     model_kwargs['additional_loss_weighting'] = random.choice([1, 5, 10, 50, 100, 500, 1000, 5000, 10000])
         elif y_col == 'xrkl':
             model_kwargs['additional_loss_weighting'] = random.choice([.2, .5, 1, 5, 10])
         else:
