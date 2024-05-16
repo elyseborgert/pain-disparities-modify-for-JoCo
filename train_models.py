@@ -368,7 +368,7 @@ class TransferLearningPytorchModel():
         else:
             self.metric_to_use_as_stopping_criterion = 'val_negative_rmse'
         assert (self.n_additional_image_features_to_predict > 0) == (self.additional_loss_weighting > 0)
-        assert self.n_additional_image_features_to_predict in [0, 3, 19, 22]
+        assert self.n_additional_image_features_to_predict in [0, 3, 15, 22]
 
         assert pretrained_model_name in ['resnet18', 'resnet34', 'resnet50', 'resnet101', 'resnet152', 'pretrained_mura_densenet']
          
@@ -419,7 +419,7 @@ class TransferLearningPytorchModel():
             self.loss_criterion = nn.MSELoss()
             if self.fully_connected_bias_initialization is not None:
                 # we do this for Koos pain subscore because otherwise the final layer ends up with all positive weights, and that's weird/hard to interpret.
-                nn.init.constant_(self.model.fc.bias.data[:1], self.fully_connected_bias_initialization)
+                nn.init.constant(self.model.fc.bias.data[:1], self.fully_connected_bias_initialization)
                 print("Bias has been initialized to")
                 print(self.model.fc.bias)
 
@@ -537,9 +537,9 @@ class TransferLearningPytorchModel():
         concatenated_labels = []
         concatenated_outputs = []
         concatenated_binarized_education_graduated_college = []
-        concatenated_binarized_income_at_least_50k = []
+        # concatenated_binarized_income_at_least_50k = []
         concatenated_numerical_klg = []
-        concatenated_site = []
+        # concatenated_site = []
 
         if self.n_additional_image_features_to_predict > 0:
             loss_additional_loss_ratios = [] # also keep track of how big the additional regularization loss is relative to the main loss. 
@@ -560,10 +560,10 @@ class TransferLearningPytorchModel():
             numerical_klg = np.nonzero(np.array(one_hot_klg))[1]
             assert len(numerical_klg) == len(one_hot_klg)
             binarized_education_graduated_college = np.array(data['binarized_education_graduated_college'])
-            binarized_income_at_least_50k = np.array(data['binarized_income_at_least_50k'])
-            concatenated_site += list(np.array(data['site']))
+            # binarized_income_at_least_50k = np.array(data['binarized_income_at_least_50k'])
+            # concatenated_site += list(np.array(data['site']))
             concatenated_binarized_education_graduated_college += list(binarized_education_graduated_college)
-            concatenated_binarized_income_at_least_50k += list(binarized_income_at_least_50k)
+            # concatenated_binarized_income_at_least_50k += list(binarized_income_at_least_50k)
             concatenated_numerical_klg += list(numerical_klg) 
 
             # wrap them in Variable
@@ -603,6 +603,8 @@ class TransferLearningPytorchModel():
                 # print("labels on self.n_additional_image_features_to_predict > 0=",str(labels)) # debug
                 loss = self.loss_criterion(input=outputs, target=labels) 
 
+                # print("additional_features_to_predict",additional_features_to_predict)
+                # print("additional_feature_outputs",additional_feature_outputs)
                 # basically, we only add to the additional feature loss if a feature is not NaN.  
                 additional_feature_losses = ((additional_features_to_predict - additional_feature_outputs) ** 2) * additional_features_are_not_nan
                 additional_loss = additional_feature_losses.sum(dim=1).mean(dim=0)
@@ -657,7 +659,7 @@ class TransferLearningPytorchModel():
             metrics_for_epoch['%s_r' % phase] = correlation_and_rmse['r']
 
             print("Correlation between binarized_education_graduated_college and labels: %2.3f" % pearsonr(concatenated_binarized_education_graduated_college, concatenated_labels)[0])
-            print("Correlation between binarized_income_at_least_50k and labels: %2.3f" % pearsonr(concatenated_binarized_income_at_least_50k, concatenated_labels)[0])
+            # print("Correlation between binarized_income_at_least_50k and labels: %2.3f" % pearsonr(concatenated_binarized_income_at_least_50k, concatenated_labels)[0])
 
             # if Koos score, also compute AUC + AUPRC for the binarized versions. 
             if self.y_col == 'koos_pain_subscore': 
@@ -668,8 +670,7 @@ class TransferLearningPytorchModel():
                 metrics_for_epoch['%s_binarized_auc' % phase] = binarized_auc_and_auprc['auc']
                 metrics_for_epoch['%s_binarized_auprc' % phase] = binarized_auc_and_auprc['auprc']
                 
-                metrics_for_epoch['%s_ses_betas' % phase] = {'binarized_education_graduated_college_betas':None, 
-                'binarized_income_at_least_50k_betas':None}
+                metrics_for_epoch['%s_ses_betas' % phase] = {'binarized_education_graduated_college_betas':None}
 
                 if phase == 'test':
                     # compute SES pain gaps for KLG >= 2. 
@@ -681,11 +682,10 @@ class TransferLearningPytorchModel():
                     income_pain_gaps = analysis.compare_pain_levels_for_people_geq_klg_2(yhat=np.array(concatenated_outputs), 
                         y=np.array(concatenated_labels), 
                         klg=np.array(concatenated_numerical_klg), 
-                        ses=np.array(concatenated_binarized_income_at_least_50k), 
+                        ses=np.array(concatenated_binarized_education_graduated_college), 
                         y_col=self.y_col)
 
-                    metrics_for_epoch['%s_pain_gaps_klg_geq_2' % phase] = {'binarized_education_graduated_college':education_pain_gaps, 
-                    'binarized_income_at_least_50k':income_pain_gaps}
+                    metrics_for_epoch['%s_pain_gaps_klg_geq_2' % phase] = {'binarized_education_graduated_college':education_pain_gaps}
                 
                 if phase == 'test' or phase == 'val':
                     # Stratify test performance by KLG. 
@@ -696,12 +696,12 @@ class TransferLearningPytorchModel():
                             y=np.array(concatenated_labels)[klg_idxs], yhat=np.array(concatenated_outputs)[klg_idxs], binary_prediction=False)
 
                     # Stratify performance excluding one site at a time. 
-                    metrics_for_epoch['stratified_by_site'] = {}
-                    concatenated_site = np.array(concatenated_site)
-                    for site_val in sorted(list(set(concatenated_site))):
-                        exclude_site_idxs = concatenated_site != site_val
-                        metrics_for_epoch['stratified_by_site']['every_site_but_%s' % site_val] = analysis.assess_performance(
-                            y=np.array(concatenated_labels)[exclude_site_idxs], yhat=np.array(concatenated_outputs)[exclude_site_idxs], binary_prediction=False)
+                    # metrics_for_epoch['stratified_by_site'] = {}
+                    # concatenated_site = np.array(concatenated_site)
+                    # for site_val in sorted(list(set(concatenated_site))):
+                    #     exclude_site_idxs = concatenated_site != site_val
+                    #     metrics_for_epoch['stratified_by_site']['every_site_but_%s' % site_val] = analysis.assess_performance(
+                    #         y=np.array(concatenated_labels)[exclude_site_idxs], yhat=np.array(concatenated_outputs)[exclude_site_idxs], binary_prediction=False)
 
 
             else:
@@ -858,50 +858,50 @@ def train_one_model(experiment_to_run):
         dataset_kwargs, model_kwargs = generate_config_that_performs_well('womac_pain_subscore')
     elif experiment_to_run == 'train_best_model_continuous':
         dataset_kwargs, model_kwargs = generate_config_that_performs_well('womac_pain_subscore')
-    elif experiment_to_run == 'increase_diversity':
-        dataset_kwargs, model_kwargs = generate_config_that_performs_well('koos_pain_subscore')
-        ses_col = random.choice(['binarized_income_at_least_50k', 'binarized_education_graduated_college'])
-        n_seeds_to_fit = 5
-        if ses_col == 'race_black':
-            minority_val = 1
-        else:
-            minority_val = 0
-        if random.random() < 1./(n_seeds_to_fit + 1.):
-            exclude_minority_group = True
-        else:
-            exclude_minority_group = False
-        dataset_kwargs['increase_diversity_kwargs'] = {'ses_col':ses_col, 'minority_val':minority_val, 'exclude_minority_group':exclude_minority_group}
-        if not dataset_kwargs['increase_diversity_kwargs']['exclude_minority_group']:
-            dataset_kwargs['increase_diversity_kwargs']['majority_group_seed'] = random.choice(range(n_seeds_to_fit))
-        else:
-            dataset_kwargs['increase_diversity_kwargs']['majority_group_seed'] = None
-    elif experiment_to_run == 'change_ses_weighting':
-        dataset_kwargs, model_kwargs = generate_config_that_performs_well('koos_pain_subscore')
-        ses_col = 'race_black'
-        if ses_col == 'binarized_income_at_least_50k':
-            p = random.choice([0, 1])
-        elif ses_col == 'binarized_education_graduated_college':
-            p = random.choice([0, 1])
-        elif ses_col == 'race_black':
-            p = 0 # remove minority group; can't remove majority group because minority is too small. 
-        else:
-            raise Exception("invalid ses col")
+    # elif experiment_to_run == 'increase_diversity':
+    #     dataset_kwargs, model_kwargs = generate_config_that_performs_well('koos_pain_subscore')
+    #     ses_col = random.choice(['binarized_income_at_least_50k', 'binarized_education_graduated_college'])
+    #     n_seeds_to_fit = 5
+    #     if ses_col == 'race_black':
+    #         minority_val = 1
+    #     else:
+    #         minority_val = 0
+    #     if random.random() < 1./(n_seeds_to_fit + 1.):
+    #         exclude_minority_group = True
+    #     else:
+    #         exclude_minority_group = False
+    #     dataset_kwargs['increase_diversity_kwargs'] = {'ses_col':ses_col, 'minority_val':minority_val, 'exclude_minority_group':exclude_minority_group}
+    #     if not dataset_kwargs['increase_diversity_kwargs']['exclude_minority_group']:
+    #         dataset_kwargs['increase_diversity_kwargs']['majority_group_seed'] = random.choice(range(n_seeds_to_fit))
+    #     else:
+    #         dataset_kwargs['increase_diversity_kwargs']['majority_group_seed'] = None
+    # elif experiment_to_run == 'change_ses_weighting':
+    #     dataset_kwargs, model_kwargs = generate_config_that_performs_well('koos_pain_subscore')
+    #     ses_col = 'race_black'
+    #     if ses_col == 'binarized_income_at_least_50k':
+    #         p = random.choice([0, 1])
+    #     elif ses_col == 'binarized_education_graduated_college':
+    #         p = random.choice([0, 1])
+    #     elif ses_col == 'race_black':
+    #         p = 0 # remove minority group; can't remove majority group because minority is too small. 
+    #     else:
+    #         raise Exception("invalid ses col")
 
-        dataset_kwargs['weighted_ses_sampler_kwargs'] = {'ses_col':ses_col, 
-                                'covs':None,#DEMOGRAPHIC_CONTROLS + ['C(xrkl)'], 
-                                'p_high_ses':p,
-                                'use_propensity_scores':False}
-    elif experiment_to_run == 'change_ses_weighting_with_propensity_matching':
-        dataset_kwargs, model_kwargs = generate_config_that_performs_well('koos_pain_subscore')
-        dataset_kwargs['weighted_ses_sampler_kwargs'] = {'ses_col':'binarized_income_at_least_50k', 
-                                'covs':AGE_RACE_SEX_SITE + ['C(xrkl)'], 
-                                'p_high_ses':random.choice([0., 0.5, 1.]),#random.choice([.1, .25, .5, .75, .9]), 
-                                'use_propensity_scores':True}
-    elif experiment_to_run == 'remove_correlation_between_pain_and_ses':
-        dataset_kwargs, model_kwargs = generate_config_that_performs_well('koos_pain_subscore')
-        dataset_kwargs['remove_correlation_between_pain_and_ses_kwargs'] = {'ses_col':random.choice(['binarized_income_at_least_50k', 
-            'binarized_education_graduated_college', 'race_black']), 
-        'pain_col':'koos_pain_subscore'}
+    #     dataset_kwargs['weighted_ses_sampler_kwargs'] = {'ses_col':ses_col, 
+    #                             'covs':None,#DEMOGRAPHIC_CONTROLS + ['C(xrkl)'], 
+    #                             'p_high_ses':p,
+    #                             'use_propensity_scores':False}
+    # elif experiment_to_run == 'change_ses_weighting_with_propensity_matching':
+    #     dataset_kwargs, model_kwargs = generate_config_that_performs_well('koos_pain_subscore')
+    #     dataset_kwargs['weighted_ses_sampler_kwargs'] = {'ses_col':'binarized_income_at_least_50k', 
+    #                             'covs':AGE_RACE_SEX_SITE + ['C(xrkl)'], 
+    #                             'p_high_ses':random.choice([0., 0.5, 1.]),#random.choice([.1, .25, .5, .75, .9]), 
+    #                             'use_propensity_scores':True}
+    # elif experiment_to_run == 'remove_correlation_between_pain_and_ses':
+    #     dataset_kwargs, model_kwargs = generate_config_that_performs_well('koos_pain_subscore')
+    #     dataset_kwargs['remove_correlation_between_pain_and_ses_kwargs'] = {'ses_col':random.choice(['binarized_income_at_least_50k', 
+    #         'binarized_education_graduated_college', 'race_black']), 
+    #     'pain_col':'koos_pain_subscore'}
     elif experiment_to_run == 'train_on_both_knees':
         dataset_kwargs, model_kwargs = generate_random_config()
         dataset_kwargs['show_both_knees_in_each_image'] = True
@@ -915,9 +915,9 @@ def train_one_model(experiment_to_run):
     elif experiment_to_run == 'blur_image':
         dataset_kwargs, model_kwargs = generate_config_that_performs_well('koos_pain_subscore')
         dataset_kwargs['blur_filter'] = random.choice([1/2., 1/4., 1/8., 1/16., 1/32., 1/64.])#random.choice([0, 1, 2, 5, 8, 10, 15, 20, 50])
-    elif experiment_to_run == 'hold_out_one_imaging_site':
-        dataset_kwargs, model_kwargs = generate_config_that_performs_well('koos_pain_subscore')
-        dataset_kwargs['hold_out_one_imaging_site_kwargs'] = {'site_to_remove':random.choice(['A', 'B', 'C', 'D', 'E'])}
+    # elif experiment_to_run == 'hold_out_one_imaging_site':
+    #     dataset_kwargs, model_kwargs = generate_config_that_performs_well('koos_pain_subscore')
+    #     dataset_kwargs['hold_out_one_imaging_site_kwargs'] = {'site_to_remove':random.choice(['A', 'B', 'C', 'D', 'E'])}
     else:
         raise Exception("not a valid experiment")
 
@@ -932,7 +932,7 @@ def train_one_model(experiment_to_run):
     all_training_results = pytorch_model.train(dataloaders=dataloaders, dataset_sizes=dataset_sizes)
 
     # stratify test performance by SES. 
-    high_ses_idxs = copy.deepcopy(datasets['test'].non_image_data['binarized_income_at_least_50k'] == True).values
+    high_ses_idxs = copy.deepcopy(datasets['test'].non_image_data['binarized_education_graduated_college'] == True).values
     y = copy.deepcopy(all_training_results['test_set_results']['test_y'])
     yhat = copy.deepcopy(all_training_results['test_set_results']['test_yhat'])
     binary_prediction = model_kwargs['binary_prediction']
@@ -972,10 +972,10 @@ def generate_random_config():
     Checked. 
     """
     #print("Random state at the beginning is", random.getstate())
-    y_col = random.choice(['koos_pain_subscore'])#, 'binarized_koos_pain_subscore'])#random.choice(['binarized_education_graduated_college', 'binarized_income_at_least_50k', 'koos_pain_subscore_residual'])
-    if y_col in ['binarized_koos_pain_subscore', 'binarized_education_graduated_college', 'binarized_income_at_least_50k']:
+    y_col = random.choice(['womac_pain_subscore'])#, 'binarized_koos_pain_subscore'])#random.choice(['binarized_education_graduated_college', 'binarized_income_at_least_50k', 'koos_pain_subscore_residual'])
+    if y_col in ['binarized_education_graduated_college']:
         binary_prediction = True
-    elif y_col in ['koos_pain_subscore', 'xrkl', 'koos_pain_subscore_residual']:
+    elif y_col in ['womac_pain_subscore', 'xrkl']:
         binary_prediction = False
     else:
         raise Exception("Not a valid y column")
@@ -1003,7 +1003,7 @@ def generate_random_config():
     'show_both_knees_in_each_image':show_both_knees_in_each_image,
     'downsample_factor_on_reload':random.choice([None]) if not crop_to_just_the_knee else random.choice([0.5, None]),#random.choice([None, 0.7, 0.5, 0.3]), # Originally images were 512 x 512 and downsample factors were [None, 0.7]. Now images are 1024 by 1024. 
     'weighted_ses_sampler_kwargs':None, 
-    'additional_features_to_predict':random.choice([None, CLINICAL_CONTROL_COLUMNS, OTHER_KOOS_PAIN_SUBSCORES, CLINICAL_CONTROL_COLUMNS+OTHER_KOOS_PAIN_SUBSCORES]),
+    'additional_features_to_predict':random.choice([None, CLINICAL_CONTROL_COLUMNS]),
     'seed_to_further_shuffle_train_test_val_sets':None}
 
     if (dataset_kwargs['downsample_factor_on_reload'] in [0.7, None]) and not crop_to_just_the_knee:
@@ -1067,11 +1067,11 @@ def generate_random_config():
     if model_kwargs['n_additional_image_features_to_predict'] > 0:
         if binary_prediction:
             model_kwargs['additional_loss_weighting'] = random.choice([0.1, 0.5, 1, 2, 5, 10, 20]) # tried smaller values, didn't do as well. 
-        elif y_col == 'koos_pain_subscore_residual':
-            model_kwargs['additional_loss_weighting'] = random.choice([.1, 1, 5, 10, 50, 100])
-        elif y_col == 'koos_pain_subscore':
-            # need a higher weighting because this loss is on a larger scale (Koos ranges from 0 - 100).
-            model_kwargs['additional_loss_weighting'] = random.choice([1, 5, 10, 50, 100, 500, 1000, 5000, 10000])
+        # elif y_col == 'koos_pain_subscore_residual':
+        #     model_kwargs['additional_loss_weighting'] = random.choice([.1, 1, 5, 10, 50, 100])
+        # elif y_col == 'koos_pain_subscore':
+        #     # need a higher weighting because this loss is on a larger scale (Koos ranges from 0 - 100).
+        #     model_kwargs['additional_loss_weighting'] = random.choice([1, 5, 10, 50, 100, 500, 1000, 5000, 10000])
         elif y_col == 'xrkl':
             model_kwargs['additional_loss_weighting'] = random.choice([.2, .5, 1, 5, 10])
         else:
@@ -1114,7 +1114,7 @@ def generate_config_that_performs_well(variable_to_predict):
             "binary_prediction": False,
             "conv_layers_before_end_to_unfreeze": 12,
             "fully_connected_bias_initialization": 90,
-            "n_additional_image_features_to_predict": 19,
+            "n_additional_image_features_to_predict": 15,
             "num_epochs": 15,
             "optimizer_kwargs": {
                 "betas": [
@@ -1156,7 +1156,7 @@ def generate_config_that_performs_well(variable_to_predict):
             "binary_prediction": True,
             "conv_layers_before_end_to_unfreeze": 14,
             "fully_connected_bias_initialization": None,
-            "n_additional_image_features_to_predict": 19,
+            "n_additional_image_features_to_predict": 15,
             "num_epochs": 10,
             "optimizer_kwargs": {
                 "betas": [

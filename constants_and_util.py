@@ -144,8 +144,8 @@ assert RESAMPLED_IMAGE_SIZE[0] == RESAMPLED_IMAGE_SIZE[1]
 
 IMAGE_DATASET_KWARGS = json.loads(os.getenv('IMAGE_DATASET_KWARGS'))
 
-GAPS_OF_INTEREST_COLS = ['race_black', 'binarized_income_at_least_50k', 'binarized_education_graduated_college', 'is_male']
-CLINICAL_CONTROL_COLUMNS = ['xrosfm', 'xrscfm','xrcyfm', 'xrjsm', 'xrchm','xrostm','xrsctm','xrcytm','xrattm','xrkl','xrosfl','xrscfl','xrcyfl', 'xrjsl','xrchl','xrostl','xrsctl','xrcytl','xrattl']
+GAPS_OF_INTEREST_COLS = ['race_black', 'binarized_education_graduated_college', 'is_male']
+CLINICAL_CONTROL_COLUMNS = json.loads(os.getenv('CLINICAL_CONTROL_COLUMNS'))
 OTHER_KOOS_PAIN_SUBSCORES = ['koos_function_score', 'koos_quality_of_life_score', 'koos_symptoms_score']
 MEDICATION_CODES = {'V00RXACTM':'Acetaminophen', 
                         'V00RXANALG':'Analgesic',
@@ -480,7 +480,7 @@ def get_combined_dataframe(non_image_dataset, clinical_assessments):
 
     missing_data_fracs_by_col = pd.DataFrame(missing_data_fracs_by_col) 
     print(missing_data_fracs_by_col.sort_values(by='missing_data')[::-1])
-
+    print("end - get_combined_dataframe()")
     return combined_data
 
 def find_image_barcodes_that_pass_qc(non_image_dataset):
@@ -505,8 +505,8 @@ def find_image_barcodes_that_pass_qc(non_image_dataset):
             good_barcodes_for_visit = set(good_barcodes_for_visit)
             assert len(good_barcodes_for_visit.intersection(all_good_barcodes)) == 0
             all_good_barcodes = all_good_barcodes.union(good_barcodes_for_visit)
-    all_good_barcodes = ['0' + str(int(a)) for a in all_good_barcodes] # first digit is truncated; it's a 0 -- so we add it back in. 
-    assert all([len(a) == 12 for a in all_good_barcodes])
+    # all_good_barcodes = ['0' + str(int(a)) for a in all_good_barcodes] # we do not want an extra digit added for Joco
+    # assert all([len(a) == 12 for a in all_good_barcodes]) # joco barcodes are not 12 numbers long so not important
     all_good_barcodes = set(all_good_barcodes)
     return all_good_barcodes
 
@@ -515,11 +515,12 @@ def ensure_barcodes_match(combined_df, image_codes):
     Sanity check: make sure non-image data matches image data. 
     """
     print("Ensuring that barcodes line up.")
+    if len(combined_df)==0:  # we need to stop things if the dataframe is empty
+        raise Exception("The combined_df appears to be empty within ensure_barcodes_match()!!")
     assert len(combined_df) == len(image_codes)
     for idx in range(len(combined_df)):
         barcode = str(combined_df.iloc[idx]['barcdbu'])
-        if len(barcode) == 11:
-            barcode = '0' + barcode
+        # removing the leading zero the code was adding to the barcode
         side = str(combined_df.iloc[idx]['side'])
         code_in_df = barcode + '*' + side
 
@@ -540,29 +541,35 @@ def match_image_dataset_to_non_image_dataset(image_dataset, non_image_dataset, s
     clinical_assessments = copy.deepcopy(non_image_dataset.processed_dataframes['kxr_sq_bu'])
     # assert clinical_assessments['barcdbu'].map(lambda x:len(x) == 12).all()   # we will assume our IDs are correct
     print(clinical_assessments.head())
-    print("Prior to filtering for images that pass QC, %i images" % len(clinical_assessments))
-
+    print("Prior to filtering for images that pass QC, clinical_assessments len=%i " % len(clinical_assessments))
+    print("...and non_image_dataset len=%i" % len(non_image_dataset.processed_dataframes))
+    print("...and non_image_dataset.processed_dataframes['all_knee_pain_scores'] len=%i" % len(non_image_dataset.processed_dataframes['all_knee_pain_scores']))
+    
     # wpg - we are going to assume all of our images pass QC (even though we have no QC measures in place)
     # acceptable_barcodes = find_image_barcodes_that_pass_qc(non_image_dataset)
     # clinical_assessments = clinical_assessments.loc[clinical_assessments['barcdbu'].map(lambda x:x in acceptable_barcodes)]
     # print("After filtering for images that pass QC, %i images" % len(clinical_assessments)) # this doesn't filter out a lot of clinical assessments, even though a lot of values in the xray01 etc datasets are NA, because those values are already filtered out of the kxr_sq_bu -- you can't assign image scores to an image which isn't available. 
     
     combined_df = get_combined_dataframe(non_image_dataset, clinical_assessments)
+    if len(combined_df)==0:  # we need to stop things if the dataframe is empty
+        raise Exception("Within match_image_dataset_to_non_image_dataset, the combined_df appears to be empty!!")
     # if clinical_assessments:    # debugging
     # print("clinical_assessments=", str(clinical_assessments))
     #if combined_df:             # debugging
     #print("combined_df=", str(combined_df))      # print the first three rows of the dataframe
     non_image_keys = list(combined_df['barcdbu'].map(str) + '*' + combined_df['side'])
-    #print("non_image_keys list=",str(non_image_keys))
+    print("non_image_keys list=",str(non_image_keys))
     non_image_keys = dict(zip(non_image_keys, range(len(non_image_keys))))
-    #print("non_image_keys dict=",str(non_image_keys))
+    print("non_image_keys dict=",str(non_image_keys))
     matched_images = [None for i in range(len(combined_df))]
-    #print("matched_images=", str(matched_images))
+    print("matched_images=", str(matched_images))
     image_codes = [None for i in range(len(combined_df))]
     #print("match_image_dataset_to_non_image_dataset combined_df=",len(combined_df)," and matched_images=",len(matched_images)," and image_codes=",len(image_codes))
     for i in range(len(image_dataset.images)):
         if i % 1000 == 0:
             print('Image %i/%i' % (i, len(image_dataset.images)))   # after every thousand images print out the number that was processed
+            print("image_dataset.images[i]=",image_dataset.images[i])  # want to see what this data looks like
+            print("image_dataset.images[i]['barcode']=",image_dataset.images[i]['barcode'])
         image = image_dataset.images[i]
         if not swap_left_and_right:
             left_key = str(image['barcode']) + '*left'
@@ -582,17 +589,19 @@ def match_image_dataset_to_non_image_dataset(image_dataset, non_image_dataset, s
             image_codes[idx] = right_key
 
         # this statement is strictly for debugging
-    #     if i % 1000 == 0:
-    #         print('right_key=',right_key,'/ left_key=',left_key)
-    #         print("1st set matched_images #",len(matched_images))
-    # print("matched_images again=", str(matched_images))
+        if i % 1000 == 0:
+            print('right_key=',right_key,'/ left_key=',left_key)
+            print("1st set matched_images #",len(matched_images))
+    print("matched_images again=", str(matched_images))
     combined_df['has_matched_image'] = [a is not None for a in matched_images]
+    print("what is within the combined_df['has_matched_image']:",combined_df['has_matched_image'])
     print("Fraction of clinical x-ray ratings with matched images")
     print(combined_df[['has_matched_image', 'visit', 'side']].groupby(['visit', 'side']).agg(['mean', 'sum']))
     idxs_to_keep = []
     for i in range(len(combined_df)):
         if combined_df['has_matched_image'].values[i]:
             idxs_to_keep.append(i)
+    print("we will keep the following idxs_to_keep values:",idxs_to_keep)
     combined_df = combined_df.iloc[idxs_to_keep]
     combined_df.index = range(len(combined_df))
     matched_images = [matched_images[i] for i in idxs_to_keep]
